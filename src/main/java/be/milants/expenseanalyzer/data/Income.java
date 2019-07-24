@@ -10,10 +10,10 @@ import javax.persistence.Id;
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor
-public class Receiving {
+public class Income {
     @Id
     private String counterPartAccount;
-    private String receivingAmount;
+    private String incomeAmount;
     private String statement;
     private String date;
     private String currentBalance;
