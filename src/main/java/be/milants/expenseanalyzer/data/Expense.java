@@ -15,6 +15,7 @@ import java.util.Date;
 @Getter
 public class Expense {
 
+    @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String accountNumber;
