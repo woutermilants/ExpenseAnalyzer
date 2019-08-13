@@ -4,8 +4,18 @@ spring:
     driverClassName: org.mariadb.jdbc.Driver
     username: root
     password: root
+
+        properties:
+          hibernate:
+            hbm2ddl:
+              auto=update:
   jpa:
     database-platform: org.hibernate.dialect.MariaDBDialect
+    properties:
+      hibernate:
+        hbm2ddl:
+          auto: update
+
 
 server:
   port: 8089
