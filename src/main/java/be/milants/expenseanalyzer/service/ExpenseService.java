@@ -77,14 +77,8 @@ public class ExpenseService {
         Map<String, List<Expense>> monthExpenses = new HashMap<>();
         List<Expense> expenses = expenseRepository.findAll();
 
-
         expenses.stream().filter(expense -> expense.getDirection().equals(Direction.COST)).forEach(expense -> addToMap(monthExpenses, expense));
-
-        System.out.println(monthExpenses);
-
         monthExpenses.forEach((key, value) -> System.out.println(key + " : " + value.stream().map(Expense::getAmountInCents).reduce(0, (a,b)-> a+b).intValue()/100));
-
-
     }
 
     private void addToMap(Map monthExpenses, Expense expense) {
