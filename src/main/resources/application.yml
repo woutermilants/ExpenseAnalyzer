@@ -2,20 +2,15 @@ spring:
   datasource:
     url: jdbc:mariadb://localhost:3306/expenses
     driverClassName: org.mariadb.jdbc.Driver
-    username: root
-    password: root
+    username: tomcat
+    password: tomcat
 
-        properties:
-          hibernate:
-            hbm2ddl:
-              auto=update:
   jpa:
     database-platform: org.hibernate.dialect.MariaDBDialect
     properties:
       hibernate:
         hbm2ddl:
           auto: update
-
 
 server:
   port: 8089

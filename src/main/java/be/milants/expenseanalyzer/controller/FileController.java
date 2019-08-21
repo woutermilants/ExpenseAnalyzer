@@ -1,6 +1,7 @@
 package be.milants.expenseanalyzer.controller;
 
 import be.milants.expenseanalyzer.data.Direction;
+import be.milants.expenseanalyzer.data.Expense;
 import be.milants.expenseanalyzer.service.ExpenseService;
 import com.opencsv.CSVParser;
 import com.opencsv.CSVParserBuilder;
@@ -14,10 +15,11 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
+import java.nio.charset.StandardCharsets;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @RestController
 @Slf4j
@@ -36,12 +38,12 @@ public class FileController {
             File csvFile = convert(file);
             // Create an object of filereader
             // class with CSV file as a parameter.
-            FileReader filereader = new FileReader(csvFile);
-
+            //FileReader filereader = new FileReader(csvFile);
+            InputStreamReader inputStreamReader = new InputStreamReader(new FileInputStream(csvFile), StandardCharsets.ISO_8859_1);
             // create csvReader object passing
             // file reader as a parameter
             CSVParser parser = new CSVParserBuilder().withSeparator(';').build();
-            CSVReader csvReader = new CSVReaderBuilder(filereader).withCSVParser(parser).build();
+            CSVReader csvReader = new CSVReaderBuilder(inputStreamReader).withCSVParser(parser).build();
 
             String[] nextRecord;
 
@@ -64,15 +66,18 @@ public class FileController {
                 String statement = nextRecord[17];
 
                 Direction direction = determineCostOrIncome(incomeAmount, costAmount);
-
-                expenseService.createExpense(accountNumber, accountName, currency, date, description, currentBalance, absAmount,  direction, counterPartAccount, counterPartName, statement);
-
+                expenseService.createExpense(accountNumber, accountName, currency, date, description, currentBalance, absAmount, direction, counterPartAccount, counterPartName, statement);
                 for (String cell : nextRecord) {
-               //     System.out.print(cell + "\t");
+                    //     System.out.print(cell + "\t");
                 }
-              //  System.out.println();
+                //  System.out.println();
             }
-            expenseService.getExpensesByMonth();
+            Map<String, List<Expense>> groupedByCounterPart = expenseService.getGroupedByCounterPart();
+            List<String> collect = groupedByCounterPart.keySet()
+                    .stream()
+                    .filter(key -> groupedByCounterPart.get(key).size() > 5)
+                    .collect(Collectors.toList());
+            groupedByCounterPart.toString();
         } catch (Exception e) {
             e.printStackTrace();
         }

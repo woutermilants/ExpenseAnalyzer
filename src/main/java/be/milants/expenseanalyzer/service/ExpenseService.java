@@ -69,7 +69,10 @@ public class ExpenseService {
                 .statement(statement)
                 .build();
 
-        expenseRepository.save(expense);
+        if (!expenseRepository.findByCounterPartAccountAndDateAndStatementAndCurrentBalance(
+                counterPartAccount, formattedTransactionDate, statement, currentBalance).isPresent()) {
+            expenseRepository.save(expense);
+        }
     }
 
 
@@ -78,7 +81,7 @@ public class ExpenseService {
         List<Expense> expenses = expenseRepository.findAll();
 
         expenses.stream().filter(expense -> expense.getDirection().equals(Direction.COST)).forEach(expense -> addToMap(monthExpenses, expense));
-        monthExpenses.forEach((key, value) -> System.out.println(key + " : " + value.stream().map(Expense::getAmountInCents).reduce(0, (a,b)-> a+b).intValue()/100));
+        monthExpenses.forEach((key, value) -> System.out.println(key + " : " + value.stream().map(Expense::getAmountInCents).reduce(0, (a, b) -> a + b).intValue() / 100));
     }
 
     private void addToMap(Map monthExpenses, Expense expense) {
@@ -92,6 +95,22 @@ public class ExpenseService {
 
     private String extractMonthYear(Expense expense) {
         LocalDate localDate = expense.getDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
-        return localDate.getMonthValue() +"/" + localDate.getYear();
+        return localDate.getMonthValue() + "/" + localDate.getYear();
+    }
+
+    public Map<String, List<Expense>> getGroupedByCounterPart() {
+        List<Expense> expenses = expenseRepository.findAll();
+        Map<String, List<Expense>> groupedByCounterPart = new HashMap<>();
+
+        for (Expense expense : expenses) {
+            if (!groupedByCounterPart.containsKey(expense.getCounterPartAccount())) {
+                groupedByCounterPart.put(expense.getCounterPartAccount(), new ArrayList<>());
+            }
+            List<Expense> counterPartExpenses = groupedByCounterPart.get(expense.getCounterPartAccount());
+            counterPartExpenses.add(expense);
+            groupedByCounterPart.put(expense.getCounterPartAccount(), counterPartExpenses);
+        }
+
+        return groupedByCounterPart;
     }
 }
