@@ -10,6 +10,7 @@ import com.opencsv.CSVReaderBuilder;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -72,15 +73,32 @@ public class FileController {
                 }
                 //  System.out.println();
             }
-            Map<String, List<Expense>> groupedByCounterPart = expenseService.getGroupedByCounterPart();
-            List<String> collect = groupedByCounterPart.keySet()
-                    .stream()
-                    .filter(key -> groupedByCounterPart.get(key).size() > 5)
-                    .collect(Collectors.toList());
-            groupedByCounterPart.toString();
+            expenseService.getExpensesByMonth(Direction.COST);
+            expenseService.getExpensesByMonth(Direction.INCOME);
+
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    @GetMapping("/report")
+    public String getAllReports() {
+        StringBuilder output = new StringBuilder();
+        output.append("Costs per month \n");
+        output.append(expenseService.getExpensesByMonth(Direction.COST));
+        output.append("\n\n");
+        output.append("Income per month \n");
+        output.append(expenseService.getExpensesByMonth(Direction.INCOME));
+        output.append("\n\n");
+        output.append("Total income per counter part : \n");
+        output.append(expenseService.getTotalPerCounterPart(Direction.INCOME));
+        output.append("\n\n");
+        output.append("Total cost per counter part : \n");
+        output.append(expenseService.getTotalPerCounterPart(Direction.COST));
+        output.append("Recurring payments : \n");
+        output.append(expenseService.getGroupedByCounterPart(Direction.COST));
+
+        return output.toString();
     }
 
     private Direction determineCostOrIncome(String incomeAmount, String costAmount) {

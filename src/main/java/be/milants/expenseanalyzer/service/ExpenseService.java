@@ -17,6 +17,9 @@ import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.*;
+import java.util.stream.Collectors;
+
+import static java.util.stream.Collectors.toList;
 
 @Service
 public class ExpenseService {
@@ -76,13 +79,46 @@ public class ExpenseService {
     }
 
 
-    public void getExpensesByMonth() {
+    public String getExpensesByMonth(Direction direction) {
         Map<String, List<Expense>> monthExpenses = new HashMap<>();
         List<Expense> expenses = expenseRepository.findAll();
 
-        expenses.stream().filter(expense -> expense.getDirection().equals(Direction.COST)).forEach(expense -> addToMap(monthExpenses, expense));
-        monthExpenses.forEach((key, value) -> System.out.println(key + " : " + value.stream().map(Expense::getAmountInCents).reduce(0, (a, b) -> a + b).intValue() / 100));
+        expenses.stream().filter(expense -> expense.getDirection().equals(direction)).forEach(expense -> addToMap(monthExpenses, expense));
+
+        StringBuilder output = new StringBuilder();
+
+        //monthExpenses.forEach((key, value) -> output.append(key + " : " + value.stream().map(Expense::getAmountInCents).reduce(0, (a,b)-> a+b).intValue()/100 + "\n"));
+
+        SortedSet<String> keys = new TreeSet<>(monthExpenses.keySet());
+        for (String key : keys) {
+            output.append(key).append(" : ").append(monthExpenses.get(key).stream().map(Expense::getAmountInCents).reduce(0, (a, b) -> a + b).intValue() / 100).append("\n");
+        }
+
+        return output.toString();
     }
+
+    public String getTotalPerCounterPart(Direction direction) {
+        Map<String, Integer> counterPartIncomes = new HashMap<>();
+        List<Expense> expenses = expenseRepository.findAll();
+
+        List<Expense> incomes = expenses.stream()
+                .filter(expense -> expense.getDirection().equals(direction))
+                .collect(Collectors.toList());
+
+        for (Expense income : incomes) {
+            String key = income.getCounterPartName() + " " + income.getCounterPartAccount();
+            counterPartIncomes.putIfAbsent(key, 0);
+            counterPartIncomes.put(key, counterPartIncomes.get(key) + income.getAmountInCents());
+        }
+
+        Map sortedCounterPartIncomes = MapUtil.sortByValue(counterPartIncomes);
+
+        StringBuilder output = new StringBuilder();
+        sortedCounterPartIncomes.keySet().forEach(key -> output.append(key + " : " + (int) sortedCounterPartIncomes.get(key) / 100 + "\n"));
+
+        return output.toString();
+    }
+
 
     private void addToMap(Map monthExpenses, Expense expense) {
         String monthYear = extractMonthYear(expense);
@@ -95,14 +131,19 @@ public class ExpenseService {
 
     private String extractMonthYear(Expense expense) {
         LocalDate localDate = expense.getDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
-        return localDate.getMonthValue() + "/" + localDate.getYear();
+
+        return String.format("%02d", localDate.getMonthValue()) +"/" + localDate.getYear();
     }
 
-    public Map<String, List<Expense>> getGroupedByCounterPart() {
+    public Map<String, List<Expense>> getGroupedByCounterPart(Direction direction) {
         List<Expense> expenses = expenseRepository.findAll();
         Map<String, List<Expense>> groupedByCounterPart = new HashMap<>();
 
-        for (Expense expense : expenses) {
+        List<Expense> filteredExpenses = expenses.stream()
+                .filter(expense -> expense.getDirection().equals(direction))
+                .collect(toList());
+
+        for (Expense expense : filteredExpenses) {
             if (!groupedByCounterPart.containsKey(expense.getCounterPartAccount())) {
                 groupedByCounterPart.put(expense.getCounterPartAccount(), new ArrayList<>());
             }
