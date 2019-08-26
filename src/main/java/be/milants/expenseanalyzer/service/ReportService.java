@@ -19,14 +19,14 @@ public class ReportService {
 
     public Map<String, List<Expense>> recurringPayments() {
         final Map<String, List<Expense>> groupedByCounterPart = expenseService.getGroupedByCounterPart(Direction.COST);
-        List<String> collect = groupedByCounterPart.entrySet()
+        Map<String, List<Expense>> recurringPayments = groupedByCounterPart.entrySet()
                 .stream()
                 .filter(entry -> entry.getValue().size() > 2)
                 .filter(entry -> paymentOccursInAtLeastXConsecutiveYears(entry.getValue(), 2))
-                .filter(entry -> amountIsAlmostTheSame(entry.getV))
-                .collect(Collectors.toList());
+                .filter(entry -> amountIsAlmostTheSame(entry.getValue()))
+                .collect(toMap(Map.Entry::getKey, Map.Entry::getValue));
 
-        return collect;
+        return recurringPayments;
     }
 
     private boolean amountIsAlmostTheSame(List<Expense> expenses) {
