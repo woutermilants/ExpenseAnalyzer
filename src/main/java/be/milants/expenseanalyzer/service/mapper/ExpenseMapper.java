@@ -7,7 +7,6 @@ import org.mapstruct.Mapper;
 @Mapper(componentModel = "spring")
 public abstract class ExpenseMapper {
 
-
     public abstract Expense dtoToDomain(ExpenseDto expenseDto);
 
     public abstract ExpenseDto domainToDTO(Expense expense);
