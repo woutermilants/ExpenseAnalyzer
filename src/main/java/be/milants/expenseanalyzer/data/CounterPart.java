@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 
@@ -15,6 +16,7 @@ import javax.persistence.Id;
 public class CounterPart {
 
     @Id
+    @Column(length = 40)
     private String accountNumber;
     private String name;
 }

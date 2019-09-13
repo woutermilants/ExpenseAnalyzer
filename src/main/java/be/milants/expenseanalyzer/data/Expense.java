@@ -18,6 +18,7 @@ public class Expense {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(length = 40)
     private Long id;
     private String accountNumber;
     private String accountName;
