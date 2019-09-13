@@ -30,6 +30,13 @@ public class FileController {
     @Autowired
     ExpenseService expenseService;
 
+    @PostMapping("/uploadFiles")
+    public void uploadFile(@RequestParam("file") MultipartFile[] files) {
+        for (MultipartFile file : files) {
+            uploadFile(file);
+        }
+    }
+
     @PostMapping("/uploadFile")
     public void uploadFile(@RequestParam("file") MultipartFile file) {
         System.out.println(file);
