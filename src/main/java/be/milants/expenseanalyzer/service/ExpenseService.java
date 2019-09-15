@@ -91,7 +91,6 @@ public class ExpenseService {
                 .counterPartName(counterPartName)
                 .statement(statement)
                 .build();
-
         if (!expenseRepository.findByCounterPartAccountAndDateAndStatementAndCurrentBalance(
                 counterPartAccount, formattedTransactionDate, statement, currentBalance).isPresent()) {
             expenseRepository.save(expense);

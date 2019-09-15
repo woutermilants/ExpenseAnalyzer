@@ -2,7 +2,9 @@ package be.milants.expenseanalyzer.controller;
 
 import be.milants.expenseanalyzer.data.Direction;
 import be.milants.expenseanalyzer.data.Expense;
+import be.milants.expenseanalyzer.service.CounterPartService;
 import be.milants.expenseanalyzer.service.ExpenseService;
+import be.milants.expenseanalyzer.service.ReportService;
 import com.opencsv.CSVParser;
 import com.opencsv.CSVParserBuilder;
 import com.opencsv.CSVReader;
@@ -10,10 +12,7 @@ import com.opencsv.CSVReaderBuilder;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.*;
@@ -24,23 +23,30 @@ import java.util.stream.Collectors;
 
 @RestController
 @Slf4j
+@CrossOrigin(origins = "*", allowedHeaders = "*")
 public class FileController {
 
 
     @Autowired
-    ExpenseService expenseService;
-
-    @PostMapping("/uploadFiles")
-    public void uploadFile(@RequestParam("file") MultipartFile[] files) {
-        for (MultipartFile file : files) {
-            uploadFile(file);
-        }
-    }
+    private ExpenseService expenseService;
+    @Autowired
+    private CounterPartService counterPartService;
+    @Autowired
+    private ReportService reportService;
 
     @PostMapping("/uploadFile")
-    public void uploadFile(@RequestParam("file") MultipartFile file) {
-        System.out.println(file);
+    public void uploadFile(@RequestParam("file") MultipartFile[] files) {
+        //System.out.println(file);
 
+        for (MultipartFile file : files) {
+            parseFile(file);
+        }
+
+        expenseService.getExpensesByMonth(Direction.COST);
+        expenseService.getExpensesByMonth(Direction.INCOME);
+    }
+
+    private void parseFile(@RequestParam("file") MultipartFile file) {
         try {
 
             File csvFile = convert(file);
@@ -73,18 +79,24 @@ public class FileController {
                 String counterPartName = nextRecord[14];
                 String statement = nextRecord[17];
 
+                counterPartService.create(counterPartAccount, counterPartName);
+
                 Direction direction = determineCostOrIncome(incomeAmount, costAmount);
                 expenseService.createExpense(accountNumber, accountName, currency, date, description, currentBalance, absAmount, direction, counterPartAccount, counterPartName, statement);
-                for (String cell : nextRecord) {
-                    //     System.out.print(cell + "\t");
-                }
-                //  System.out.println();
+                log.info("expense created");
             }
-            expenseService.getExpensesByMonth(Direction.COST);
-            expenseService.getExpensesByMonth(Direction.INCOME);
-
         } catch (Exception e) {
             e.printStackTrace();
+        }
+    }
+
+    @GetMapping("/recurring")
+    public void getRecurring() {
+        Map<String, List<Expense>> stringListMap = reportService.recurringPayments();
+        for (String key : stringListMap.keySet()) {
+            log.info(key);
+            log.info(stringListMap.get(key).toString());
+            log.info("----");
         }
     }
 

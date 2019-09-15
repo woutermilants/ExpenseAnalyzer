@@ -19,4 +19,11 @@ public class CounterPart {
     @Column(length = 40)
     private String accountNumber;
     private String name;
+    private boolean recurringCounterPart;
+    private boolean ownAccount;
+
+    public CounterPart(String accountNumber, String name) {
+        this.accountNumber = accountNumber;
+        this.name = name;
+    }
 }
