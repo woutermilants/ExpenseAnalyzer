@@ -12,7 +12,6 @@ import be.milants.expenseanalyzer.repository.IncomeRepository;
 import be.milants.expenseanalyzer.service.mapper.ExpenseMapper;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -51,7 +50,6 @@ public class ExpenseService {
                 page.getTotalElements()
         );
     }
-
 
     public void createCounterPart(String counterPartAccount, String counterPartName) {
         if (StringUtils.isNotBlank(counterPartAccount) && StringUtils.isNotBlank(counterPartName)) {
