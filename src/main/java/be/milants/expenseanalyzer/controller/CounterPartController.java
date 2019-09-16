@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-@RestController(value = "/counterpart")
+@RestController(value = "/counterparts")
 @Slf4j
 @RequiredArgsConstructor
 @CrossOrigin(origins = "*", allowedHeaders = "*")
@@ -19,7 +19,7 @@ public class CounterPartController {
 
     private final CounterPartService counterPartService;
 
-    @GetMapping()
+    @GetMapping("/")
     public Page<CounterPartDto> getAllCounterParts(
             @RequestParam(defaultValue = "0") Integer page,
             @RequestParam(defaultValue = "10") Integer size,

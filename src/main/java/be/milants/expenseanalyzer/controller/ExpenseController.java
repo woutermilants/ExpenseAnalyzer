@@ -1,6 +1,5 @@
 package be.milants.expenseanalyzer.controller;
 
-import be.milants.expenseanalyzer.data.Expense;
 import be.milants.expenseanalyzer.expense.rest.model.ExpenseDto;
 import be.milants.expenseanalyzer.service.ExpenseService;
 import be.milants.expenseanalyzer.util.PageRequestUtil;
@@ -12,7 +11,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-@RestController
+@RestController(value = "/expenses")
 @Slf4j
 @RequiredArgsConstructor
 @CrossOrigin(origins = "*", allowedHeaders = "*")
