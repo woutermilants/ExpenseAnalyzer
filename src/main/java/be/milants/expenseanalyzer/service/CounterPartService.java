@@ -1,6 +1,7 @@
 package be.milants.expenseanalyzer.service;
 
 import be.milants.expenseanalyzer.data.CounterPart;
+import be.milants.expenseanalyzer.data.Direction;
 import be.milants.expenseanalyzer.expense.rest.model.CounterPartDto;
 import be.milants.expenseanalyzer.repository.CounterPartRepository;
 import be.milants.expenseanalyzer.service.mapper.CounterPartMapper;
@@ -11,6 +12,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -19,6 +21,7 @@ public class CounterPartService {
 
     private CounterPartRepository counterPartRepository;
     private CounterPartMapper counterPartMapper;
+    private ExpenseService expenseService;
 
     public void create(String accountNumber, String name) {
         counterPartRepository.save(new CounterPart(accountNumber, name));
@@ -39,4 +42,11 @@ public class CounterPartService {
         );
     }
 
+    public Double calculateTotalForCounterPart(Long id, Direction cost) {
+        Optional<CounterPart> optionalCounterPart = counterPartRepository.findById(id);
+        if (optionalCounterPart.isPresent()) {
+            expenseService.getTotalForCounterPart(id, cost);
+        }
+        return 0.0d;
+    }
 }

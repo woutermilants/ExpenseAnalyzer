@@ -171,4 +171,7 @@ public class ExpenseService {
 
         return groupedByCounterPart;
     }
+
+    public void getTotalForCounterPart(Long id, Direction cost) {
+    }
 }
