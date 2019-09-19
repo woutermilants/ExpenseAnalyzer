@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-@RestController(value = "/expenses")
+@RestController
 @Slf4j
 @RequiredArgsConstructor
 @CrossOrigin(origins = "*", allowedHeaders = "*")
@@ -19,7 +19,7 @@ public class ExpenseController {
 
     private final ExpenseService expenseService;
 
-    @GetMapping()
+    @GetMapping(value = "/expenses")
     public Page<ExpenseDto> getAllExpenses(
             @RequestParam(defaultValue = "0") Integer page,
             @RequestParam(defaultValue = "10") Integer size,
