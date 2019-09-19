@@ -17,7 +17,7 @@ public class CounterPartController {
 
     private final CounterPartService counterPartService;
 
-    @GetMapping("/counterParts")
+    @GetMapping(value = "/counterParts")
     public Page<CounterPartDto> getAllCounterParts(
             @RequestParam(defaultValue = "0") Integer page,
             @RequestParam(defaultValue = "10") Integer size,
