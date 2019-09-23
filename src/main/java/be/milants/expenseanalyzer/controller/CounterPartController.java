@@ -31,4 +31,10 @@ public class CounterPartController {
     public Double getTotalForCounterPart(@PathVariable Long id) {
         return counterPartService.calculateTotalForCounterPart(id, Direction.COST);
     }
+
+    @PutMapping(value = "/{id}")
+    public void updateCounterpart(@PathVariable Long id,
+                                  @RequestParam CounterPartDto counterPartDto) {
+        counterPartService.updateCounterpart(id, counterPartDto);
+    }
 }

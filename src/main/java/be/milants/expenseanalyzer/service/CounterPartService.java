@@ -49,4 +49,13 @@ public class CounterPartService {
         }
         return 0.0d;
     }
+
+    public void updateCounterpart(Long id, CounterPartDto counterPartDto) {
+        Optional<CounterPart> optionalCounterPart = counterPartRepository.findById(id);
+        optionalCounterPart.ifPresent(counterPart -> {
+            counterPart.setOwnAccount(counterPartDto.isOwnAccount());
+            counterPart.setRecurringCounterPart(counterPartDto.isRecurringCounterPart());
+            counterPartRepository.save(counterPart);
+        });
+    }
 }
