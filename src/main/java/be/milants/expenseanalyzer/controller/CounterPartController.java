@@ -35,6 +35,7 @@ public class CounterPartController {
     @PutMapping(value = "/{id}")
     public void updateCounterpart(@PathVariable Long id,
                                   @RequestParam CounterPartDto counterPartDto) {
+        log.info("Updating counterpart with id {}", id);
         counterPartService.updateCounterpart(id, counterPartDto);
     }
 }
