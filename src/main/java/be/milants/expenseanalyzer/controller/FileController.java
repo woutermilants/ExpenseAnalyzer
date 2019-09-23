@@ -19,7 +19,6 @@ import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 @RestController
 @Slf4j
@@ -79,10 +78,10 @@ public class FileController {
                 String counterPartName = nextRecord[14];
                 String statement = nextRecord[17];
 
-                counterPartService.create(counterPartAccount, counterPartName);
+                counterPartService.create(counterPartAccount.replaceAll(" ", ""), counterPartName);
 
                 Direction direction = determineCostOrIncome(incomeAmount, costAmount);
-                expenseService.createExpense(accountNumber, accountName, currency, date, description, currentBalance, absAmount, direction, counterPartAccount, counterPartName, statement);
+                expenseService.createExpense(accountNumber.replaceAll(" ", ""), accountName, currency, date, description, currentBalance, absAmount, direction, counterPartAccount, counterPartName, statement);
                 log.info("expense created");
             }
         } catch (Exception e) {
