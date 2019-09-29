@@ -14,4 +14,6 @@ public class CounterPartDto {
     private String name;
     private boolean recurringCounterPart;
     private boolean ownAccount;
+    private double totalAmountInCentsReceived;
+    private double totalAmountInCentsSpent;
 }

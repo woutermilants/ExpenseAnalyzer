@@ -40,12 +40,9 @@ public class FileController {
         for (MultipartFile file : files) {
             parseFile(file);
         }
-
-        expenseService.getExpensesByMonth(Direction.COST);
-        expenseService.getExpensesByMonth(Direction.INCOME);
     }
 
-    private void parseFile(@RequestParam("file") MultipartFile file) {
+    private void parseFile(MultipartFile file) {
         try {
 
             File csvFile = convert(file);
@@ -109,10 +106,10 @@ public class FileController {
         output.append(expenseService.getExpensesByMonth(Direction.INCOME));
         output.append("\n\n");
         output.append("Total income per counter part : \n");
-        output.append(expenseService.getTotalPerCounterPart(Direction.INCOME));
+        output.append(expenseService.getAllTotalsPerCounterPart(Direction.INCOME));
         output.append("\n\n");
         output.append("Total cost per counter part : \n");
-        output.append(expenseService.getTotalPerCounterPart(Direction.COST));
+        output.append(expenseService.getAllTotalsPerCounterPart(Direction.COST));
         output.append("Recurring payments : \n");
         output.append(expenseService.getGroupedByCounterPart(Direction.COST));
 

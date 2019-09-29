@@ -1,6 +1,5 @@
 package be.milants.expenseanalyzer.controller;
 
-import be.milants.expenseanalyzer.data.Direction;
 import be.milants.expenseanalyzer.expense.rest.model.CounterPartDto;
 import be.milants.expenseanalyzer.service.CounterPartService;
 import be.milants.expenseanalyzer.util.PageRequestUtil;
@@ -10,6 +9,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
+@RequestMapping
 @Slf4j
 @RequiredArgsConstructor
 @CrossOrigin(origins = "*", allowedHeaders = "*")
@@ -27,15 +27,15 @@ public class CounterPartController {
         return counterPartService.findAll(PageRequestUtil.getPageRequest(page, size, sortColumn, direction));
     }
 
-    @GetMapping("/{id}/totalIncome")
+/*    @GetMapping(value = "/counterparts/{id}/totalIncome")
     public Double getTotalForCounterPart(@PathVariable Long id) {
         return counterPartService.calculateTotalForCounterPart(id, Direction.COST);
-    }
+    }*/
 
-    @PutMapping(value = "/{id}")
-    public void updateCounterpart(@PathVariable Long id,
-                                  @RequestParam CounterPartDto counterPartDto) {
-        log.info("Updating counterpart with id {}", id);
-        counterPartService.updateCounterpart(id, counterPartDto);
+    @PutMapping(value = "/counterparts/{accountNumber}")
+    public CounterPartDto updateCounterpart(@PathVariable String accountNumber,
+                                            @RequestBody CounterPartDto counterPartDto) {
+        log.info("Updating counterpart with accountNumber {}", accountNumber);
+        return counterPartService.updateCounterpart(accountNumber, counterPartDto);
     }
 }

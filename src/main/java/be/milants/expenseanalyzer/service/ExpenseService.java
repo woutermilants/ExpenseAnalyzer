@@ -114,7 +114,17 @@ public class ExpenseService {
         return output.toString();
     }
 
-    public String getTotalPerCounterPart(Direction direction) {
+    public double getTotalPerCounterPart(String accountNumber, Direction direction) {
+        List<Expense> expenses = expenseRepository.findByCounterPartAccount(accountNumber);
+        Integer total = expenses.stream()
+                .filter(expense -> expense.getDirection().equals(direction))
+                .map(Expense::getAmountInCents)
+                .reduce(0, Integer::sum);
+
+        return total / 100;
+    }
+
+    public String getAllTotalsPerCounterPart(Direction direction) {
         Map<String, Integer> counterPartIncomes = new HashMap<>();
         List<Expense> expenses = expenseRepository.findAll();
 
@@ -170,8 +180,5 @@ public class ExpenseService {
         }
 
         return groupedByCounterPart;
-    }
-
-    public void getTotalForCounterPart(Long id, Direction cost) {
     }
 }
