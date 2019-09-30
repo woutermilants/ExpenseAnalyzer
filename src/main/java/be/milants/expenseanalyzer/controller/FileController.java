@@ -42,9 +42,9 @@ public class FileController {
         }
     }
 
-    private void parseFile(MultipartFile file) {
+    public void parseFile(MultipartFile file) {
         try {
-
+            log.info("parsing file");
             File csvFile = convert(file);
             // Create an object of filereader
             // class with CSV file as a parameter.
