@@ -6,7 +6,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 import static java.util.Map.Entry.comparingByKey;
 import static java.util.stream.Collectors.toMap;
@@ -23,14 +22,34 @@ public class ReportService {
                 .stream()
                 .filter(entry -> entry.getValue().size() > 2)
                 .filter(entry -> paymentOccursInAtLeastXConsecutiveYears(entry.getValue(), 2))
-                .filter(entry -> amountIsAlmostTheSame(entry.getValue()))
+                .map(this::removeAllNonRelatedValues)
                 .collect(toMap(Map.Entry::getKey, Map.Entry::getValue));
 
         return recurringPayments;
     }
 
-    private boolean amountIsAlmostTheSame(List<Expense> expenses) {
-        return true;
+    private Map.Entry<String, List<Expense>> removeAllNonRelatedValues(Map.Entry<String, List<Expense>> value) {
+        Iterator<Expense> iterator = value.getValue().iterator();
+        if (iterator.hasNext()) {
+            Integer amountInCents = iterator.next().getAmountInCents();
+            while (iterator.hasNext()) {
+                Expense currentExpense = iterator.next();
+                if (areValuesClose(currentExpense.getAmountInCents(), amountInCents)) {
+                    // do nothing
+                } else {
+                    iterator.remove();
+                }
+            }
+        }
+        return value;
+    }
+
+    private boolean areValuesClose(Integer currentAmountInCents, Integer amountInCentsToCompareTo) {
+        if ((currentAmountInCents > amountInCentsToCompareTo * (double) 0.9) &&
+                currentAmountInCents < amountInCentsToCompareTo * (double) 1.1) {
+            return true;
+        }
+        return false;
     }
 
     private boolean paymentOccursInAtLeastXConsecutiveYears(List<Expense> expenses, int requiredNumberOfConsecutiveYears) {

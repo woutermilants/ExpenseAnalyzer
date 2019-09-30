@@ -6,6 +6,7 @@ import be.milants.expenseanalyzer.expense.rest.model.CounterPartDto;
 import be.milants.expenseanalyzer.repository.CounterPartRepository;
 import be.milants.expenseanalyzer.service.mapper.CounterPartMapper;
 import lombok.AllArgsConstructor;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -24,7 +25,9 @@ public class CounterPartService {
     private ExpenseService expenseService;
 
     public void create(String accountNumber, String name) {
-        counterPartRepository.save(new CounterPart(accountNumber, name));
+        if (StringUtils.isNotBlank(name)) {
+            counterPartRepository.save(new CounterPart(accountNumber, name));
+        }
     }
 
     public Page<CounterPartDto> findAll(PageRequest pageRequest) {
