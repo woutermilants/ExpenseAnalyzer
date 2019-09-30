@@ -78,7 +78,7 @@ public class FileController {
                 counterPartService.create(counterPartAccount.replaceAll(" ", ""), counterPartName);
 
                 Direction direction = determineCostOrIncome(incomeAmount, costAmount);
-                expenseService.createExpense(accountNumber.replaceAll(" ", ""), accountName, currency, date, description, currentBalance, absAmount, direction, counterPartAccount, counterPartName, statement);
+                expenseService.createExpense(accountNumber.replaceAll(" ", ""), accountName, currency, date, description, currentBalance, absAmount, direction, counterPartAccount.replaceAll(" ", ""), counterPartName, statement);
                 log.info("expense created");
             }
         } catch (Exception e) {

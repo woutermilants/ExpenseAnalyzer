@@ -68,4 +68,12 @@ public class CounterPartService {
         }
         return null;
     }
+
+    public CounterPartDto findByAccountNumber(String accountNumber) {
+        final Optional<CounterPart> optionalCounterPart = counterPartRepository.findByAccountNumber(accountNumber);
+        if (optionalCounterPart.isPresent()) {
+            return counterPartMapper.domainToDTO(optionalCounterPart.get());
+        }
+        return null;
+    }
 }

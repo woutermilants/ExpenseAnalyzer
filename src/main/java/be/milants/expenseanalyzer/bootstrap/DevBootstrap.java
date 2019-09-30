@@ -1,6 +1,10 @@
 package be.milants.expenseanalyzer.bootstrap;
 
 import be.milants.expenseanalyzer.controller.FileController;
+import be.milants.expenseanalyzer.data.Expense;
+import be.milants.expenseanalyzer.service.CounterPartService;
+import be.milants.expenseanalyzer.service.ExpenseService;
+import be.milants.expenseanalyzer.service.ReportService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationListener;
@@ -14,6 +18,8 @@ import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.List;
+import java.util.Map;
 
 @Component
 @RequiredArgsConstructor
@@ -21,13 +27,30 @@ import java.nio.file.Paths;
 public class DevBootstrap implements ApplicationListener<ContextRefreshedEvent> {
 
     private final FileController fileController;
+    private final ReportService reportService;
+    private final CounterPartService counterPartService;
 
     @Override
     public void onApplicationEvent(ContextRefreshedEvent event) {
         try {
             initData();
+
+            logRecurring();
         } catch (Exception e) {
             log.error("error", e);
+        }
+    }
+
+    private void logRecurring() {
+        final Map<String, List<Expense>> stringListMap = reportService.recurringPayments();
+        for (String key : stringListMap.keySet()) {
+            final String counterPartName = counterPartService.findByAccountNumber(key).getName();
+            log.info(key + " " + counterPartName);
+            log.info(" ");
+            for (Expense expense : stringListMap.get(key)) {
+                log.info(expense.getCounterPartAccount() + " " + expense.getCounterPartName() + " " + expense.getAmountInCents()/ (double) 100);
+            }
+            log.info(" ");
         }
     }
 

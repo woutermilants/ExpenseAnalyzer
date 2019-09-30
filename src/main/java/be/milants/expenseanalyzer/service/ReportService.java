@@ -53,16 +53,16 @@ public class ReportService {
 
         int numberOfConsecutiveYears = 1;
         final Iterator<Map.Entry<Integer, List<Expense>>> iterator = sortedExpensesByYear.entrySet().iterator();
-        int lastYearExpenseOccurred = iterator.next().getKey();
+        int firstYearOccurred = iterator.next().getKey();
         while (iterator.hasNext()) {
             final Integer nextYear = iterator.next().getKey();
-            if (lastYearExpenseOccurred == nextYear + 1) {
+            if (firstYearOccurred == nextYear - 1) {
                 numberOfConsecutiveYears++;
                 if (numberOfConsecutiveYears >= requiredNumberOfConsecutiveYears) {
                     return true;
                 }
             } else {
-                lastYearExpenseOccurred = nextYear;
+                firstYearOccurred = nextYear;
                 numberOfConsecutiveYears = 1;
             }
         }
