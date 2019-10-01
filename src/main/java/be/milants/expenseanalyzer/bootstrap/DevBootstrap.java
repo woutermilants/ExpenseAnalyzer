@@ -1,7 +1,6 @@
 package be.milants.expenseanalyzer.bootstrap;
 
 import be.milants.expenseanalyzer.controller.FileController;
-import be.milants.expenseanalyzer.data.Expense;
 import be.milants.expenseanalyzer.service.CounterPartService;
 import be.milants.expenseanalyzer.service.ReportService;
 import lombok.RequiredArgsConstructor;
@@ -17,9 +16,6 @@ import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.text.SimpleDateFormat;
-import java.util.List;
-import java.util.Map;
 
 @Component
 @RequiredArgsConstructor
@@ -35,25 +31,9 @@ public class DevBootstrap implements ApplicationListener<ContextRefreshedEvent> 
         try {
             initData();
 
-            logRecurring();
+            reportService.logRecurring();
         } catch (Exception e) {
             log.error("error", e);
-        }
-    }
-
-    private void logRecurring() {
-        final Map<String, List<Expense>> stringListMap = reportService.recurringPayments();
-        for (String key : stringListMap.keySet()) {
-            try {
-                final String counterPartName = counterPartService.findByAccountNumber(key).getName();
-                log.info(key + " " + counterPartName);
-                log.info(" ");
-                for (Expense expense : stringListMap.get(key)) {
-                    log.info(expense.getCounterPart().getAccountNumber() + " " + expense.getCounterPart().getName() + " " + expense.getAmount() + " " + new SimpleDateFormat().format(expense.getDate()));
-                }
-                log.info(" ");
-            } catch (Exception e) {
-            }
         }
     }
 

@@ -1,11 +1,14 @@
 package be.milants.expenseanalyzer.service;
 
+import be.milants.expenseanalyzer.data.CounterPart;
 import be.milants.expenseanalyzer.data.Direction;
 import be.milants.expenseanalyzer.data.Expense;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 import static java.util.Map.Entry.comparingByKey;
@@ -13,34 +16,37 @@ import static java.util.stream.Collectors.toMap;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class ReportService {
 
     private final ExpenseService expenseService;
+    private final CounterPartService counterPartService;
 
-    public Map<String, List<Expense>> recurringPayments() {
-        //final Map<String, List<Expense>> groupedByCounterPart = expenseService.getGroupedByCounterPart(Direction.COST);
-return null;
-/*        groupedByCounterPart.entrySet()
-                .stream()
-                .filter(Expense::)*/
-
-
-
-
-/*        return groupedByCounterPart.entrySet()
-                .stream()
-                .filter(entry -> entry.getValue().size() > 2)
-                .filter(entry -> paymentOccursInAtLeastXConsecutiveYears(entry.getValue(), 2))
-                .map(this::removeAllNonRelatedValues)
-                .filter(this::removeListsWith1Entry)
-                .filter(entry -> paymentOccursInAtLeastXConsecutiveYears(entry.getValue(), 2))
-                .collect(toMap(Map.Entry::getKey, Map.Entry::getValue));*/
-
-
+    public void logRecurring() {
+        final Map<String, List<Expense>> stringListMap = recurringPayments();
+        for (String key : stringListMap.keySet()) {
+            try {
+                final String counterPartName = counterPartService.findByAccountNumber(key).getName();
+                log.info(key + " " + counterPartName);
+                log.info(" ");
+                for (Expense expense : stringListMap.get(key)) {
+                    log.info(expense.getCounterPart().getAccountNumber() + " " + expense.getCounterPart().getName() + " " + expense.getAmount() + " " + new SimpleDateFormat().format(expense.getDate()));
+                }
+                log.info(" ");
+            } catch (Exception e) {
+            }
+        }
     }
 
-    private boolean removeListsWith1Entry(Map.Entry<String, List<Expense>> entry) {
-        return entry.getValue().size() > 1;
+    public Map<String, List<Expense>> recurringPayments() {
+        Map<CounterPart, List<Expense>> groupedByCounterPart = expenseService.getGroupedByCounterPart(Direction.COST);
+        groupedByCounterPart.entrySet()
+                .stream()
+                .filter(counterPartListEntry -> counterPartListEntry.getValue().size() > 1)
+                .filter(counterPartListEntry -> counterPartListEntry.getKey().isRecurringCounterPart())
+                .collect(toMap(Map.Entry::getKey, Map.Entry::getValue, (e1, e2) -> e2, LinkedHashMap::new));
+        return Collections.emptyMap();
+
     }
 
     private Map.Entry<String, List<Expense>> removeAllNonRelatedValues(Map.Entry<String, List<Expense>> value) {
@@ -63,8 +69,8 @@ return null;
 
     private boolean areValuesClose(BigDecimal currentAmount, BigDecimal amountToCompareTo) {
         double withinPercentage = 0.2;
-        if ((Math.abs(amountToCompareTo.doubleValue() * (1-withinPercentage)) < Math.abs(currentAmount.doubleValue())) &&
-                Math.abs(currentAmount.doubleValue()) < Math.abs(amountToCompareTo.doubleValue() * (1+withinPercentage))) {
+        if ((Math.abs(amountToCompareTo.doubleValue() * (1 - withinPercentage)) < Math.abs(currentAmount.doubleValue())) &&
+                Math.abs(currentAmount.doubleValue()) < Math.abs(amountToCompareTo.doubleValue() * (1 + withinPercentage))) {
             return true;
         }
         return false;
