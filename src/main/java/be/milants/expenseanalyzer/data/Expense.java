@@ -3,6 +3,7 @@ package be.milants.expenseanalyzer.data;
 import lombok.*;
 
 import javax.persistence.*;
+import java.math.BigDecimal;
 import java.util.Date;
 
 @Entity
@@ -26,9 +27,10 @@ public class Expense {
     @Column(length = 1024)
     private String description;
     private String currentBalance;
-    private Integer amountInCents;
+    private BigDecimal amount;
     private Direction direction;
-    private String counterPartAccount;
-    private String counterPartName;
+    @ManyToOne
+    @JoinColumn(name="counterpart", nullable=false)
+    private CounterPart counterPart;
     private String statement;
 }

@@ -17,6 +17,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
@@ -69,10 +70,10 @@ public class ExpenseService {
 
     }
 
-    public void createExpense(String accountNumber, String accountName, String currency, String transactionDate, String description, String currentBalance, String amount, Direction direction, String counterPartAccount, String counterPartName, String statement) throws ParseException {
+    public void createExpense(String accountNumber, String accountName, String currency, String transactionDate, String description, String currentBalance, String stringAmount, Direction direction, CounterPart counterPart, String statement) throws ParseException {
 
-        amount = amount.replace(",", "");
-        int amountInEurocents = Integer.valueOf(amount);
+        stringAmount = stringAmount.replace(",", ".");
+        BigDecimal amount = new BigDecimal(stringAmount);
 
         Date formattedTransactionDate = new SimpleDateFormat("dd/MM/yyyy").parse(transactionDate);
 
@@ -83,14 +84,13 @@ public class ExpenseService {
                 .date(formattedTransactionDate)
                 .description(description)
                 .currentBalance(currentBalance)
-                .amountInCents(amountInEurocents)
+                .amount(amount)
                 .direction(direction)
-                .counterPartAccount(counterPartAccount)
-                .counterPartName(counterPartName)
+                .counterPart(counterPart)
                 .statement(statement)
                 .build();
-        if (!expenseRepository.findByCounterPartAccountAndDateAndStatementAndCurrentBalance(
-                counterPartAccount, formattedTransactionDate, statement, currentBalance).isPresent()) {
+        if (!expenseRepository.findByCounterPartAndDateAndStatementAndCurrentBalance(
+                counterPart, formattedTransactionDate, statement, currentBalance).isPresent()) {
             expenseRepository.save(expense);
         }
     }
@@ -108,24 +108,28 @@ public class ExpenseService {
 
         SortedSet<String> keys = new TreeSet<>(monthExpenses.keySet());
         for (String key : keys) {
-            output.append(key).append(" : ").append(monthExpenses.get(key).stream().map(Expense::getAmountInCents).reduce(0, (a, b) -> a + b).intValue() / 100).append("\n");
+            output.append(key).append(" : ").append(monthExpenses.get(key).stream().map(Expense::getAmount).reduce(BigDecimal.ZERO, (a, b) -> a.add(b)).doubleValue()).append("\n");
         }
 
         return output.toString();
     }
 
-    public double getTotalPerCounterPart(String accountNumber, Direction direction) {
-        List<Expense> expenses = expenseRepository.findByCounterPartAccount(accountNumber);
-        Integer total = expenses.stream()
-                .filter(expense -> expense.getDirection().equals(direction))
-                .map(Expense::getAmountInCents)
-                .reduce(0, Integer::sum);
+    public BigDecimal getTotalPerCounterPart(String accountNumber, Direction direction) {
+        final Optional<CounterPart> counterPart = counterPartRepository.findByAccountNumber(accountNumber);
+        if (counterPart.isPresent()) {
+            List<Expense> expenses = expenseRepository.findByCounterPart(counterPart.get());
+            BigDecimal total = expenses.stream()
+                    .filter(expense -> expense.getDirection().equals(direction))
+                    .map(Expense::getAmount)
+                    .reduce(BigDecimal.ZERO, BigDecimal::add);
 
-        return total / 100;
+            return total;
+        }
+        throw new RuntimeException();
     }
 
     public String getAllTotalsPerCounterPart(Direction direction) {
-        Map<String, Integer> counterPartIncomes = new HashMap<>();
+        Map<String, BigDecimal> counterPartIncomes = new HashMap<>();
         List<Expense> expenses = expenseRepository.findAll();
 
         List<Expense> incomes = expenses.stream()
@@ -133,9 +137,9 @@ public class ExpenseService {
                 .collect(Collectors.toList());
 
         for (Expense income : incomes) {
-            String key = income.getCounterPartName() + " " + income.getCounterPartAccount();
-            counterPartIncomes.putIfAbsent(key, 0);
-            counterPartIncomes.put(key, counterPartIncomes.get(key) + income.getAmountInCents());
+            String key = income.getCounterPart().getName() + " " + income.getCounterPart().getAccountNumber();
+            counterPartIncomes.putIfAbsent(key, BigDecimal.ZERO);
+            counterPartIncomes.put(key, counterPartIncomes.get(key).add(income.getAmount()));
         }
 
         Map sortedCounterPartIncomes = MapUtil.sortByValue(counterPartIncomes);
@@ -159,26 +163,47 @@ public class ExpenseService {
     private String extractMonthYear(Expense expense) {
         LocalDate localDate = expense.getDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
 
-        return String.format("%02d", localDate.getMonthValue()) +"/" + localDate.getYear();
+        return String.format("%02d", localDate.getMonthValue()) + "/" + localDate.getYear();
     }
 
-    public Map<String, List<Expense>> getGroupedByCounterPart(Direction direction) {
+    public Map<CounterPart, List<Expense>> getGroupedByCounterPart(Direction direction) {
         List<Expense> expenses = expenseRepository.findAll();
-        Map<String, List<Expense>> groupedByCounterPart = new HashMap<>();
+        Map<CounterPart, List<Expense>> groupedByCounterPart = new HashMap<>();
 
         List<Expense> filteredExpenses = expenses.stream()
                 .filter(expense -> expense.getDirection().equals(direction))
                 .collect(toList());
 
         for (Expense expense : filteredExpenses) {
-            if (!groupedByCounterPart.containsKey(expense.getCounterPartAccount())) {
-                groupedByCounterPart.put(expense.getCounterPartAccount(), new ArrayList<>());
+            if (!groupedByCounterPart.containsKey(expense.getCounterPart())) {
+                groupedByCounterPart.put(expense.getCounterPart(), new ArrayList<>());
             }
-            List<Expense> counterPartExpenses = groupedByCounterPart.get(expense.getCounterPartAccount());
+            List<Expense> counterPartExpenses = groupedByCounterPart.get(expense.getCounterPart());
             counterPartExpenses.add(expense);
-            groupedByCounterPart.put(expense.getCounterPartAccount(), counterPartExpenses);
+            groupedByCounterPart.put(expense.getCounterPart(), counterPartExpenses);
         }
 
         return groupedByCounterPart;
+    }
+
+    public Map<String, List<Expense>> getGroupedByMonth(Direction direction) {
+        List<Expense> expenses = expenseRepository.findAll();
+        Map<String, List<Expense>> groupedByMonth = new HashMap<>();
+
+        List<Expense> filteredExpenses = expenses.stream()
+                .filter(expense -> expense.getDirection().equals(direction))
+                .collect(toList());
+
+        for (Expense expense : filteredExpenses) {
+            final String monthKey = extractMonthYear(expense);
+            if (!groupedByMonth.containsKey(monthKey)) {
+                groupedByMonth.put(monthKey, new ArrayList<>());
+            }
+            List<Expense> monthExpenses = groupedByMonth.get(monthKey);
+            monthExpenses.add(expense);
+            groupedByMonth.put(monthKey, monthExpenses);
+        }
+
+        return groupedByMonth;
     }
 }

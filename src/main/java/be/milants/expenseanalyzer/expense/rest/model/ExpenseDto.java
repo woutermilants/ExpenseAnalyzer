@@ -6,6 +6,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.math.BigDecimal;
 import java.util.Date;
 
 @Data
@@ -20,7 +21,7 @@ public class ExpenseDto {
     private Date date;
     private String description;
     private String currentBalance;
-    private Integer amountInCents;
+    private BigDecimal amount;
     private Direction direction;
     private String counterPartAccount;
     private String counterPartName;

@@ -5,6 +5,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.math.BigDecimal;
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -14,6 +16,6 @@ public class CounterPartDto {
     private String name;
     private boolean recurringCounterPart;
     private boolean ownAccount;
-    private double totalAmountInCentsReceived;
-    private double totalAmountInCentsSpent;
+    private BigDecimal totalAmountReceived;
+    private BigDecimal totalAmountSpent;
 }

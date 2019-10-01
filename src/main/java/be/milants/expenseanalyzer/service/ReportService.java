@@ -5,6 +5,7 @@ import be.milants.expenseanalyzer.data.Expense;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.util.*;
 
 import static java.util.Map.Entry.comparingByKey;
@@ -17,36 +18,53 @@ public class ReportService {
     private final ExpenseService expenseService;
 
     public Map<String, List<Expense>> recurringPayments() {
-        final Map<String, List<Expense>> groupedByCounterPart = expenseService.getGroupedByCounterPart(Direction.COST);
-        Map<String, List<Expense>> recurringPayments = groupedByCounterPart.entrySet()
+        //final Map<String, List<Expense>> groupedByCounterPart = expenseService.getGroupedByCounterPart(Direction.COST);
+return null;
+/*        groupedByCounterPart.entrySet()
+                .stream()
+                .filter(Expense::)*/
+
+
+
+
+/*        return groupedByCounterPart.entrySet()
                 .stream()
                 .filter(entry -> entry.getValue().size() > 2)
                 .filter(entry -> paymentOccursInAtLeastXConsecutiveYears(entry.getValue(), 2))
                 .map(this::removeAllNonRelatedValues)
-                .collect(toMap(Map.Entry::getKey, Map.Entry::getValue));
+                .filter(this::removeListsWith1Entry)
+                .filter(entry -> paymentOccursInAtLeastXConsecutiveYears(entry.getValue(), 2))
+                .collect(toMap(Map.Entry::getKey, Map.Entry::getValue));*/
 
-        return recurringPayments;
+
+    }
+
+    private boolean removeListsWith1Entry(Map.Entry<String, List<Expense>> entry) {
+        return entry.getValue().size() > 1;
     }
 
     private Map.Entry<String, List<Expense>> removeAllNonRelatedValues(Map.Entry<String, List<Expense>> value) {
+        List<Expense> newExpenses = new ArrayList<>();
         Iterator<Expense> iterator = value.getValue().iterator();
         if (iterator.hasNext()) {
-            Integer amountInCents = iterator.next().getAmountInCents();
+            final Expense toCompareTo = iterator.next();
+            BigDecimal amount = toCompareTo.getAmount();
+            newExpenses.add(toCompareTo);
             while (iterator.hasNext()) {
                 Expense currentExpense = iterator.next();
-                if (areValuesClose(currentExpense.getAmountInCents(), amountInCents)) {
-                    // do nothing
-                } else {
-                    iterator.remove();
+                if (areValuesClose(currentExpense.getAmount(), amount)) {
+                    newExpenses.add(currentExpense);
                 }
             }
         }
+        value.setValue(newExpenses);
         return value;
     }
 
-    private boolean areValuesClose(Integer currentAmountInCents, Integer amountInCentsToCompareTo) {
-        if ((currentAmountInCents > amountInCentsToCompareTo * (double) 0.9) &&
-                currentAmountInCents < amountInCentsToCompareTo * (double) 1.1) {
+    private boolean areValuesClose(BigDecimal currentAmount, BigDecimal amountToCompareTo) {
+        double withinPercentage = 0.2;
+        if ((Math.abs(amountToCompareTo.doubleValue() * (1-withinPercentage)) < Math.abs(currentAmount.doubleValue())) &&
+                Math.abs(currentAmount.doubleValue()) < Math.abs(amountToCompareTo.doubleValue() * (1+withinPercentage))) {
             return true;
         }
         return false;

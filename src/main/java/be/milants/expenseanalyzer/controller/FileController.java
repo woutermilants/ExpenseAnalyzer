@@ -1,5 +1,6 @@
 package be.milants.expenseanalyzer.controller;
 
+import be.milants.expenseanalyzer.data.CounterPart;
 import be.milants.expenseanalyzer.data.Direction;
 import be.milants.expenseanalyzer.data.Expense;
 import be.milants.expenseanalyzer.service.CounterPartService;
@@ -75,11 +76,59 @@ public class FileController {
                 String counterPartName = nextRecord[14];
                 String statement = nextRecord[17];
 
-                counterPartService.create(counterPartAccount.replaceAll(" ", ""), counterPartName);
+                if (StringUtils.isBlank(counterPartAccount)) {
+                    if (description.contains("BANCONTACT")) {
+                        log.info("BANCONTACT");
+                        counterPartAccount = "BANCONTACT";
+                    } else if (description.contains("GELDOPNEMING")) {
+                        log.info("GELDOPNEMING");
+                        counterPartAccount = "GELDOPNEMING";
+                    } else if (description.contains("MOBIELE BETALING")) {
+                        log.info("MOBIELE BETALING");
+                        counterPartAccount = "MOBIELE_BETALING";
+                    } else if (description.contains("PRICOS")) {
+                        log.info("PRICOS");
+                        counterPartAccount = "PRICOS";
+                    } else if (description.contains("PREPAID LADING")) {
+                        log.info("PREPAID LADING");
+                        counterPartAccount = "PREPAID_LADING";
+                    } else if (description.contains("AUTOMATISCH SPAREN")) {
+                        log.info("AUTOMATISCH SPAREN");
+                        counterPartAccount = "AUTOMATISCH_SPAREN";
+                    } else if (description.contains("KBC-PLUSREKENING")) {
+                        log.info("KBC-PLUSREKENING");
+                        counterPartAccount = "KBC_PLUSREKENING";
+                    } else if (description.contains("BETALING AANKOPEN VIA MAESTRO")) {
+                        log.info("BETALING AANKOPEN VIA MAESTRO");
+                        counterPartAccount = "BETALING_AANKOPEN_VIA_MAESTRO";
+                    } else if (description.contains("BETALING AANKOPEN")) {
+                        log.info("BETALING AANKOPEN");
+                        counterPartAccount = "BETALING_AANKOPEN";
+                    } else if (description.contains("STORTING KBC-AUTOMAAT")) {
+                        log.info("STORTING KBC-AUTOMAAT");
+                        counterPartAccount = "STORTING_KBC_AUTOMAAT";
+                    } else if (description.contains("BETALING TANKBEURT")) {
+                        log.info("BETALING TANKBEURT");
+                        counterPartAccount = "BETALING_TANKBEURT";
+                    } else if (description.contains("TERUGBETALING") && description.contains("WONINGKREDIET")) {
+                        log.info("TERUGBETALING WONINGKREDIET");
+                        counterPartAccount = "TERUGBETALING_WONINGKREDIET";
+                    } else if (description.contains("DOSSIERSKOSTEN")) {
+                        log.info("DOSSIERSKOSTEN");
+                        counterPartAccount = "DOSSIERKOSTEN";
+                    } else if (description.contains("AUTOMATISCH BELEGGEN")) {
+                        log.info("AUTOMATISCH BELEGGEN");
+                        counterPartAccount = "AUTOMATISCH_BELEGGEN";
+                    } else {
+                        log.warn("Empty counter part account. {}", description);
+                        continue;
+                    }
+                }
+                final CounterPart counterPart = counterPartService.create(counterPartAccount.replaceAll(" ", ""), counterPartName);
 
                 Direction direction = determineCostOrIncome(incomeAmount, costAmount);
-                expenseService.createExpense(accountNumber.replaceAll(" ", ""), accountName, currency, date, description, currentBalance, absAmount, direction, counterPartAccount.replaceAll(" ", ""), counterPartName, statement);
-                log.info("expense created");
+                expenseService.createExpense(accountNumber.replaceAll(" ", ""), accountName, currency, date, description, currentBalance, absAmount, direction, counterPart , statement);
+                //log.info("expense created");
             }
         } catch (Exception e) {
             e.printStackTrace();

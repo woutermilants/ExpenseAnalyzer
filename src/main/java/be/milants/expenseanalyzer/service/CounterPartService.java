@@ -24,10 +24,8 @@ public class CounterPartService {
     private CounterPartMapper counterPartMapper;
     private ExpenseService expenseService;
 
-    public void create(String accountNumber, String name) {
-        if (StringUtils.isNotBlank(name)) {
-            counterPartRepository.save(new CounterPart(accountNumber, name));
-        }
+    public CounterPart create(String accountNumber, String name) {
+            return counterPartRepository.save(new CounterPart(accountNumber, name));
     }
 
     public Page<CounterPartDto> findAll(PageRequest pageRequest) {
@@ -38,8 +36,8 @@ public class CounterPartService {
     }
 
     private void calculateTotalsForCounterPart(CounterPartDto counterPartDto) {
-        counterPartDto.setTotalAmountInCentsSpent(expenseService.getTotalPerCounterPart(counterPartDto.getAccountNumber(), Direction.COST));
-        counterPartDto.setTotalAmountInCentsReceived(expenseService.getTotalPerCounterPart(counterPartDto.getAccountNumber(), Direction.INCOME));
+        counterPartDto.setTotalAmountSpent(expenseService.getTotalPerCounterPart(counterPartDto.getAccountNumber(), Direction.COST));
+        counterPartDto.setTotalAmountReceived(expenseService.getTotalPerCounterPart(counterPartDto.getAccountNumber(), Direction.INCOME));
     }
 
     private Page<CounterPartDto> convertPage(Page<CounterPart> page) {

@@ -49,7 +49,7 @@ public class DevBootstrap implements ApplicationListener<ContextRefreshedEvent> 
                 log.info(key + " " + counterPartName);
                 log.info(" ");
                 for (Expense expense : stringListMap.get(key)) {
-                    log.info(expense.getCounterPartAccount() + " " + expense.getCounterPartName() + " " + expense.getAmountInCents() / (double) 100 + " " + new SimpleDateFormat().format(expense.getDate()));
+                    log.info(expense.getCounterPart().getAccountNumber() + " " + expense.getCounterPart().getName() + " " + expense.getAmount() + " " + new SimpleDateFormat().format(expense.getDate()));
                 }
                 log.info(" ");
             } catch (Exception e) {
