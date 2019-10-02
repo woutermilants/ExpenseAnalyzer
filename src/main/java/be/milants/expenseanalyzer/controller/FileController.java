@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.Map;
 
 @RestController
+@RequestMapping(path = "/file")
 @Slf4j
 @CrossOrigin(origins = "*", allowedHeaders = "*")
 @RequiredArgsConstructor
@@ -75,20 +76,24 @@ public class FileController {
                 String statement = nextRecord[17];
 
                 CounterPart.CounterPartBuilder counterPartBuilder = CounterPart.builder();
+                counterPartBuilder.recurringCounterPart(true);
 
                 if (StringUtils.isBlank(counterPartAccount)) {
                     if (description.contains("BANCONTACT")) {
                         log.info("BANCONTACT");
                         counterPartAccount = "BANCONTACT";
                         counterPartBuilder.accountNumber(counterPartAccount);
+                        counterPartBuilder.recurringCounterPart(false);
                     } else if (description.contains("GELDOPNEMING")) {
                         log.info("GELDOPNEMING");
                         counterPartAccount = "GELDOPNEMING";
                         counterPartBuilder.accountNumber(counterPartAccount);
+                        counterPartBuilder.recurringCounterPart(false);
                     } else if (description.contains("MOBIELE BETALING")) {
                         log.info("MOBIELE BETALING");
                         counterPartAccount = "MOBIELE_BETALING";
                         counterPartBuilder.accountNumber(counterPartAccount);
+                        counterPartBuilder.recurringCounterPart(false);
                     } else if (description.contains("PRICOS")) {
                         log.info("PRICOS");
                         counterPartAccount = "PRICOS";
@@ -98,10 +103,12 @@ public class FileController {
                         log.info("PREPAID LADING");
                         counterPartAccount = "PREPAID_LADING";
                         counterPartBuilder.accountNumber(counterPartAccount);
+                        counterPartBuilder.recurringCounterPart(false);
                     } else if (description.contains("AUTOMATISCH SPAREN")) {
                         log.info("AUTOMATISCH SPAREN");
                         counterPartAccount = "AUTOMATISCH_SPAREN";
                         counterPartBuilder.accountNumber(counterPartAccount);
+                        counterPartBuilder.recurringCounterPart(false);
                     } else if (description.contains("KBC-PLUSREKENING")) {
                         log.info("KBC-PLUSREKENING");
                         counterPartAccount = "KBC_PLUSREKENING";
@@ -111,14 +118,17 @@ public class FileController {
                         log.info("BETALING AANKOPEN VIA MAESTRO");
                         counterPartAccount = "BETALING_AANKOPEN_VIA_MAESTRO";
                         counterPartBuilder.accountNumber(counterPartAccount);
+                        counterPartBuilder.recurringCounterPart(false);
                     } else if (description.contains("BETALING AANKOPEN")) {
                         log.info("BETALING AANKOPEN");
                         counterPartAccount = "BETALING_AANKOPEN";
                         counterPartBuilder.accountNumber(counterPartAccount);
+                        counterPartBuilder.recurringCounterPart(false);
                     } else if (description.contains("STORTING KBC-AUTOMAAT")) {
                         log.info("STORTING KBC-AUTOMAAT");
                         counterPartAccount = "STORTING_KBC_AUTOMAAT";
                         counterPartBuilder.accountNumber(counterPartAccount);
+                        counterPartBuilder.recurringCounterPart(false);
                     } else if (description.contains("BETALING TANKBEURT")) {
                         log.info("BETALING TANKBEURT");
                         counterPartAccount = "BETALING_TANKBEURT";
@@ -127,10 +137,12 @@ public class FileController {
                         log.info("TERUGBETALING WONINGKREDIET");
                         counterPartAccount = "TERUGBETALING_WONINGKREDIET";
                         counterPartBuilder.accountNumber(counterPartAccount);
+                        counterPartBuilder.recurringCounterPart(false);
                     } else if (description.contains("DOSSIERSKOSTEN")) {
                         log.info("DOSSIERSKOSTEN");
                         counterPartAccount = "DOSSIERKOSTEN";
                         counterPartBuilder.accountNumber(counterPartAccount);
+                        counterPartBuilder.recurringCounterPart(false);
                     } else if (description.contains("AUTOMATISCH BELEGGEN")) {
                         log.info("AUTOMATISCH BELEGGEN");
                         counterPartAccount = "AUTOMATISCH_BELEGGEN";
@@ -156,17 +168,12 @@ public class FileController {
         }
     }
 
-    @GetMapping("/recurring")
+    @GetMapping(path = "/recurring")
     public void getRecurring() {
-        Map<String, List<Expense>> stringListMap = reportService.recurringPayments();
-        for (String key : stringListMap.keySet()) {
-            log.info(key);
-            log.info(stringListMap.get(key).toString());
-            log.info("----");
-        }
+        reportService.logRecurring();
     }
 
-    @GetMapping("/report")
+    @GetMapping(path = "/report")
     public String getAllReports() {
         StringBuilder output = new StringBuilder();
         output.append("Costs per month \n");

@@ -9,7 +9,10 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static java.util.Map.Entry.comparingByKey;
 import static java.util.stream.Collectors.toMap;
@@ -26,11 +29,11 @@ public class ReportService {
         final Map<String, List<Expense>> stringListMap = recurringPayments();
         for (String key : stringListMap.keySet()) {
             try {
-                final String counterPartName = counterPartService.findByAccountNumber(key).getName();
-                log.info(key + " " + counterPartName);
+                log.info(key );
                 log.info(" ");
                 for (Expense expense : stringListMap.get(key)) {
                     log.info(expense.getCounterPart().getAccountNumber() + " " + expense.getCounterPart().getName() + " " + expense.getAmount() + " " + new SimpleDateFormat().format(expense.getDate()));
+
                 }
                 log.info(" ");
             } catch (Exception e) {
@@ -40,13 +43,18 @@ public class ReportService {
 
     public Map<String, List<Expense>> recurringPayments() {
         Map<CounterPart, List<Expense>> groupedByCounterPart = expenseService.getGroupedByCounterPart(Direction.COST);
-        groupedByCounterPart.entrySet()
+        return  groupedByCounterPart.entrySet()
                 .stream()
-                .filter(counterPartListEntry -> counterPartListEntry.getValue().size() > 1)
                 .filter(counterPartListEntry -> counterPartListEntry.getKey().isRecurringCounterPart())
-                .collect(toMap(Map.Entry::getKey, Map.Entry::getValue, (e1, e2) -> e2, LinkedHashMap::new));
-        return Collections.emptyMap();
+                .map(counterPartListEntry -> counterPartListEntry.getValue())
+                .flatMap(List::stream)
+                .collect(Collectors.groupingBy(this::extractMonthYear));
+    }
 
+    private String extractMonthYear(Expense expense) {
+        LocalDate localDate = expense.getDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+
+        return String.format("%02d", localDate.getMonthValue());
     }
 
     private Map.Entry<String, List<Expense>> removeAllNonRelatedValues(Map.Entry<String, List<Expense>> value) {

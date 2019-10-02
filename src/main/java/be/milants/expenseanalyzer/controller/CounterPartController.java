@@ -9,7 +9,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping
+@RequestMapping(path = "/counterparts")
 @Slf4j
 @RequiredArgsConstructor
 @CrossOrigin(origins = "*", allowedHeaders = "*")
@@ -17,7 +17,7 @@ public class CounterPartController {
 
     private final CounterPartService counterPartService;
 
-    @GetMapping(value = "/counterparts")
+    @GetMapping
     public Page<CounterPartDto> getAllCounterParts(
             @RequestParam(defaultValue = "0") Integer page,
             @RequestParam(defaultValue = "10") Integer size,
@@ -32,7 +32,7 @@ public class CounterPartController {
         return counterPartService.calculateTotalForCounterPart(id, Direction.COST);
     }*/
 
-    @PutMapping(value = "/counterparts/{accountNumber}")
+    @PutMapping(value = "/{accountNumber}")
     public CounterPartDto updateCounterpart(@PathVariable String accountNumber,
                                             @RequestBody CounterPartDto counterPartDto) {
         log.info("Updating counterpart with accountNumber {}", accountNumber);

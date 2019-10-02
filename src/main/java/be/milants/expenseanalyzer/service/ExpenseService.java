@@ -32,8 +32,6 @@ import static java.util.stream.Collectors.toList;
 public class ExpenseService {
 
     private final CounterPartRepository counterPartRepository;
-    private final CostRepository costRepository;
-    private final IncomeRepository incomeRepository;
     private final ExpenseRepository expenseRepository;
     private final ExpenseMapper expenseMapper;
 
@@ -50,24 +48,6 @@ public class ExpenseService {
                 page.getPageable(),
                 page.getTotalElements()
         );
-    }
-
-    public void createCounterPart(String counterPartAccount, String counterPartName) {
-        if (StringUtils.isNotBlank(counterPartAccount) && StringUtils.isNotBlank(counterPartName)) {
-            CounterPart counterPart = new CounterPart(counterPartAccount, counterPartName);
-
-            counterPartRepository.save(counterPart);
-        }
-    }
-
-    public void createCost(String counterPartAccount, String costAmount, String statement, String date, String currentBalance) {
-        costRepository.save(new Cost(counterPartAccount, costAmount, statement, date
-                , currentBalance));
-
-    }
-
-    public void createIncome(String counterPartAccount, String incomeAmount, String statement, String date, String currentBalance) {
-
     }
 
     public void createExpense(String accountNumber, String accountName, String currency, String transactionDate, String description, String currentBalance, String stringAmount, Direction direction, CounterPart counterPart, String statement) throws ParseException {

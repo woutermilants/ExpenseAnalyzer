@@ -1,5 +1,6 @@
 package be.milants.expenseanalyzer.data;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 
 import javax.persistence.Column;
@@ -22,6 +23,7 @@ public class CounterPart {
     private String name;
     private boolean recurringCounterPart;
     private boolean ownAccount;
+    @JsonIgnore
     @OneToMany(mappedBy = "counterPart")
     private List<Expense> expenses;
 
