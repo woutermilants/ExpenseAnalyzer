@@ -24,6 +24,7 @@ public class CounterPartController {
             @RequestParam(required = false) String sortColumn,
             @RequestParam(defaultValue = "desc") String direction
     ) {
+        log.info("getting all counterpart");
         return counterPartService.findAll(PageRequestUtil.getPageRequest(page, size, sortColumn, direction));
     }
 

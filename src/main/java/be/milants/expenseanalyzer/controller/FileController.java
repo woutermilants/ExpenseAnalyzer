@@ -2,7 +2,6 @@ package be.milants.expenseanalyzer.controller;
 
 import be.milants.expenseanalyzer.data.CounterPart;
 import be.milants.expenseanalyzer.data.Direction;
-import be.milants.expenseanalyzer.data.Expense;
 import be.milants.expenseanalyzer.service.CounterPartService;
 import be.milants.expenseanalyzer.service.ExpenseService;
 import be.milants.expenseanalyzer.service.ReportService;
@@ -18,8 +17,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
-import java.util.List;
-import java.util.Map;
+import java.util.Optional;
 
 @RestController
 @RequestMapping(path = "/file")
@@ -27,7 +25,6 @@ import java.util.Map;
 @CrossOrigin(origins = "*", allowedHeaders = "*")
 @RequiredArgsConstructor
 public class FileController {
-
 
     private final ExpenseService expenseService;
     private final CounterPartService counterPartService;
@@ -77,87 +74,81 @@ public class FileController {
 
                 CounterPart.CounterPartBuilder counterPartBuilder = CounterPart.builder();
                 counterPartBuilder.recurringCounterPart(true);
-
+                String formattedCounterPartAccount;
                 if (StringUtils.isBlank(counterPartAccount)) {
                     if (description.contains("BANCONTACT")) {
                         log.info("BANCONTACT");
-                        counterPartAccount = "BANCONTACT";
-                        counterPartBuilder.accountNumber(counterPartAccount);
+                        formattedCounterPartAccount = "BANCONTACT";
                         counterPartBuilder.recurringCounterPart(false);
                     } else if (description.contains("GELDOPNEMING")) {
                         log.info("GELDOPNEMING");
-                        counterPartAccount = "GELDOPNEMING";
-                        counterPartBuilder.accountNumber(counterPartAccount);
+                        formattedCounterPartAccount = "GELDOPNEMING";
                         counterPartBuilder.recurringCounterPart(false);
                     } else if (description.contains("MOBIELE BETALING")) {
                         log.info("MOBIELE BETALING");
-                        counterPartAccount = "MOBIELE_BETALING";
-                        counterPartBuilder.accountNumber(counterPartAccount);
+                        formattedCounterPartAccount = "MOBIELE_BETALING";
                         counterPartBuilder.recurringCounterPart(false);
                     } else if (description.contains("PRICOS")) {
                         log.info("PRICOS");
-                        counterPartAccount = "PRICOS";
-                        counterPartBuilder.accountNumber(counterPartAccount);
+                        formattedCounterPartAccount = "PRICOS";
                         counterPartBuilder.recurringCounterPart(true);
                     } else if (description.contains("PREPAID LADING")) {
                         log.info("PREPAID LADING");
-                        counterPartAccount = "PREPAID_LADING";
-                        counterPartBuilder.accountNumber(counterPartAccount);
+                        formattedCounterPartAccount = "PREPAID_LADING";
                         counterPartBuilder.recurringCounterPart(false);
                     } else if (description.contains("AUTOMATISCH SPAREN")) {
                         log.info("AUTOMATISCH SPAREN");
-                        counterPartAccount = "AUTOMATISCH_SPAREN";
-                        counterPartBuilder.accountNumber(counterPartAccount);
+                        formattedCounterPartAccount = "AUTOMATISCH_SPAREN";
                         counterPartBuilder.recurringCounterPart(false);
                     } else if (description.contains("KBC-PLUSREKENING")) {
                         log.info("KBC-PLUSREKENING");
-                        counterPartAccount = "KBC_PLUSREKENING";
-                        counterPartBuilder.accountNumber(counterPartAccount);
+                        formattedCounterPartAccount = "KBC_PLUSREKENING";
                         counterPartBuilder.recurringCounterPart(true);
                     } else if (description.contains("BETALING AANKOPEN VIA MAESTRO")) {
                         log.info("BETALING AANKOPEN VIA MAESTRO");
-                        counterPartAccount = "BETALING_AANKOPEN_VIA_MAESTRO";
-                        counterPartBuilder.accountNumber(counterPartAccount);
+                        formattedCounterPartAccount = "BETALING_AANKOPEN_VIA_MAESTRO";
                         counterPartBuilder.recurringCounterPart(false);
                     } else if (description.contains("BETALING AANKOPEN")) {
                         log.info("BETALING AANKOPEN");
-                        counterPartAccount = "BETALING_AANKOPEN";
-                        counterPartBuilder.accountNumber(counterPartAccount);
+                        formattedCounterPartAccount = "BETALING_AANKOPEN";
                         counterPartBuilder.recurringCounterPart(false);
                     } else if (description.contains("STORTING KBC-AUTOMAAT")) {
                         log.info("STORTING KBC-AUTOMAAT");
-                        counterPartAccount = "STORTING_KBC_AUTOMAAT";
-                        counterPartBuilder.accountNumber(counterPartAccount);
+                        formattedCounterPartAccount = "STORTING_KBC_AUTOMAAT";
                         counterPartBuilder.recurringCounterPart(false);
                     } else if (description.contains("BETALING TANKBEURT")) {
                         log.info("BETALING TANKBEURT");
-                        counterPartAccount = "BETALING_TANKBEURT";
-                        counterPartBuilder.accountNumber(counterPartAccount);
+                        formattedCounterPartAccount = "BETALING_TANKBEURT";
                     } else if (description.contains("TERUGBETALING") && description.contains("WONINGKREDIET")) {
                         log.info("TERUGBETALING WONINGKREDIET");
-                        counterPartAccount = "TERUGBETALING_WONINGKREDIET";
-                        counterPartBuilder.accountNumber(counterPartAccount);
+                        formattedCounterPartAccount = "TERUGBETALING_WONINGKREDIET";
                         counterPartBuilder.recurringCounterPart(false);
                     } else if (description.contains("DOSSIERSKOSTEN")) {
                         log.info("DOSSIERSKOSTEN");
-                        counterPartAccount = "DOSSIERKOSTEN";
-                        counterPartBuilder.accountNumber(counterPartAccount);
+                        formattedCounterPartAccount = "DOSSIERKOSTEN";
                         counterPartBuilder.recurringCounterPart(false);
                     } else if (description.contains("AUTOMATISCH BELEGGEN")) {
                         log.info("AUTOMATISCH BELEGGEN");
-                        counterPartAccount = "AUTOMATISCH_BELEGGEN";
-                        counterPartBuilder.accountNumber(counterPartAccount);
+                        formattedCounterPartAccount = "AUTOMATISCH_BELEGGEN";
                         counterPartBuilder.recurringCounterPart(true);
                     } else {
                         log.warn("Empty counter part account. {}", description);
                         continue;
                     }
                 } else {
-                    counterPartBuilder.accountNumber(counterPartAccount.replaceAll(" ", ""));
+                    log.info(counterPartAccount);
+                    formattedCounterPartAccount = counterPartAccount.replaceAll(" ", "");
                 }
-                counterPartBuilder.name(counterPartName);
+                counterPartBuilder.accountNumber(formattedCounterPartAccount);
+                counterPartBuilder.name(StringUtils.isBlank(counterPartName) ? counterPartName : description);
                 CounterPart counterPart = counterPartBuilder.build();
-                counterPartService.create(counterPart);
+                Optional<CounterPart> optionaCounterPart = counterPartService.findByAccountNumber(formattedCounterPartAccount);
+                if (!optionaCounterPart.isPresent()) {
+                    counterPartService.save(counterPart);
+                } else if (StringUtils.isBlank(optionaCounterPart.get().getName())) {
+                    optionaCounterPart.get().setName(counterPartName);
+                    counterPartService.save(optionaCounterPart.get());
+                }
 
                 Direction direction = determineCostOrIncome(incomeAmount, costAmount);
                 expenseService.createExpense(accountNumber.replaceAll(" ", ""), accountName, currency, date, description, currentBalance, absAmount, direction, counterPart, statement);

@@ -31,7 +31,7 @@ public class DevBootstrap implements ApplicationListener<ContextRefreshedEvent> 
         try {
             initData();
 
-            reportService.logRecurring();
+            //reportService.logRecurring();
         } catch (Exception e) {
             log.error("error", e);
         }

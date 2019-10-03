@@ -4,7 +4,7 @@ import be.milants.expenseanalyzer.data.CounterPart;
 import be.milants.expenseanalyzer.data.Direction;
 import be.milants.expenseanalyzer.expense.rest.model.CounterPartDto;
 import be.milants.expenseanalyzer.repository.CounterPartRepository;
-import be.milants.expenseanalyzer.service.mapper.CounterPartMapper;
+import be.milants.expenseanalyzer.service.mapper.MyMapper;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -20,12 +20,8 @@ import java.util.stream.Collectors;
 public class CounterPartService {
 
     private CounterPartRepository counterPartRepository;
-    private CounterPartMapper counterPartMapper;
+    private MyMapper myMapper;
     private ExpenseService expenseService;
-
-    public CounterPart create(CounterPart counterPart) {
-        return counterPartRepository.save(counterPart);
-    }
 
     public Page<CounterPartDto> findAll(PageRequest pageRequest) {
         Page<CounterPartDto> counterPartDtos = convertPage(counterPartRepository.findAll(pageRequest));
@@ -43,7 +39,7 @@ public class CounterPartService {
         List<CounterPart> cameras = page.getContent();
         return new PageImpl<>(
                 cameras.stream()
-                        .map(counterPartMapper::domainToDTO)
+                        .map(myMapper::domainToDTO)
                         .collect(Collectors.toList()),
                 page.getPageable(),
                 page.getTotalElements()
@@ -64,16 +60,16 @@ public class CounterPartService {
             CounterPart counterPart = optionalCounterPart.get();
             counterPart.setOwnAccount(counterPartDto.isOwnAccount());
             counterPart.setRecurringCounterPart(counterPartDto.isRecurringCounterPart());
-            return counterPartMapper.domainToDTO(counterPartRepository.save(counterPart));
+            return myMapper.domainToDTO(counterPartRepository.save(counterPart));
         }
         return null;
     }
 
-    public CounterPartDto findByAccountNumber(String accountNumber) {
-        final Optional<CounterPart> optionalCounterPart = counterPartRepository.findByAccountNumber(accountNumber);
-        if (optionalCounterPart.isPresent()) {
-            return counterPartMapper.domainToDTO(optionalCounterPart.get());
-        }
-        return null;
+    public Optional<CounterPart> findByAccountNumber(String accountNumber) {
+        return counterPartRepository.findByAccountNumber(accountNumber);
+    }
+
+    public CounterPart save(CounterPart counterPart) {
+        return counterPartRepository.save(counterPart);
     }
 }

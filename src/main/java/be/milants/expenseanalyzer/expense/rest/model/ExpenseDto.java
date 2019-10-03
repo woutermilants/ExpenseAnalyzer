@@ -23,7 +23,6 @@ public class ExpenseDto {
     private String currentBalance;
     private BigDecimal amount;
     private Direction direction;
-    private String counterPartAccount;
-    private String counterPartName;
+    private CounterPartDto counterPart;
     private String statement;
 }

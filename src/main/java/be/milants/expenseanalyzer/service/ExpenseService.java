@@ -1,17 +1,13 @@
 package be.milants.expenseanalyzer.service;
 
-import be.milants.expenseanalyzer.data.Cost;
 import be.milants.expenseanalyzer.data.CounterPart;
 import be.milants.expenseanalyzer.data.Direction;
 import be.milants.expenseanalyzer.data.Expense;
 import be.milants.expenseanalyzer.expense.rest.model.ExpenseDto;
-import be.milants.expenseanalyzer.repository.CostRepository;
 import be.milants.expenseanalyzer.repository.CounterPartRepository;
 import be.milants.expenseanalyzer.repository.ExpenseRepository;
-import be.milants.expenseanalyzer.repository.IncomeRepository;
-import be.milants.expenseanalyzer.service.mapper.ExpenseMapper;
+import be.milants.expenseanalyzer.service.mapper.MyMapper;
 import lombok.RequiredArgsConstructor;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -33,7 +29,7 @@ public class ExpenseService {
 
     private final CounterPartRepository counterPartRepository;
     private final ExpenseRepository expenseRepository;
-    private final ExpenseMapper expenseMapper;
+    private final MyMapper myMapper;
 
     public Page<ExpenseDto> getAllExpenses(PageRequest pageRequest) {
         return convertPage(expenseRepository.findAll(pageRequest));
@@ -43,7 +39,7 @@ public class ExpenseService {
         List<Expense> cameras = page.getContent();
         return new PageImpl<>(
                 cameras.stream()
-                        .map(expenseMapper::domainToDTO)
+                        .map(myMapper::domainToDTO)
                         .collect(Collectors.toList()),
                 page.getPageable(),
                 page.getTotalElements()
@@ -100,6 +96,7 @@ public class ExpenseService {
             List<Expense> expenses = expenseRepository.findByCounterPart(counterPart.get());
             BigDecimal total = expenses.stream()
                     .filter(expense -> expense.getDirection().equals(direction))
+                    .filter(expense -> expense.getAmount() != null)
                     .map(Expense::getAmount)
                     .reduce(BigDecimal.ZERO, BigDecimal::add);
 
