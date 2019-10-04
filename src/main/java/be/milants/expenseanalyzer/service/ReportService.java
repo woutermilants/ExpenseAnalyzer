@@ -46,7 +46,8 @@ public class ReportService {
         return  groupedByCounterPart.entrySet()
                 .stream()
                 .filter(counterPartListEntry -> counterPartListEntry.getKey().isRecurringCounterPart())
-                .map(counterPartListEntry -> counterPartListEntry.getValue())
+                .filter(counterPartListEntry -> !counterPartListEntry.getKey().isOwnAccount())
+                .map(Map.Entry::getValue)
                 .flatMap(List::stream)
                 .collect(Collectors.groupingBy(this::extractMonthYear));
     }

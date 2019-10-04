@@ -31,19 +31,12 @@ public class ExpenseService {
     private final ExpenseRepository expenseRepository;
     private final MyMapper myMapper;
 
-    public Page<ExpenseDto> getAllExpenses(PageRequest pageRequest) {
-        return convertPage(expenseRepository.findAll(pageRequest));
+    public Page<Expense> getAllExpenses(PageRequest pageRequest) {
+        return expenseRepository.findAll(pageRequest);
     }
 
-    private Page<ExpenseDto> convertPage(Page<Expense> page) {
-        List<Expense> cameras = page.getContent();
-        return new PageImpl<>(
-                cameras.stream()
-                        .map(myMapper::domainToDTO)
-                        .collect(Collectors.toList()),
-                page.getPageable(),
-                page.getTotalElements()
-        );
+    public List<Expense> getAllExpenses(CounterPart counterPart) {
+        return expenseRepository.findByCounterPart(counterPart);
     }
 
     public void createExpense(String accountNumber, String accountName, String currency, String transactionDate, String description, String currentBalance, String stringAmount, Direction direction, CounterPart counterPart, String statement) throws ParseException {
@@ -79,8 +72,6 @@ public class ExpenseService {
         expenses.stream().filter(expense -> expense.getDirection().equals(direction)).forEach(expense -> addToMap(monthExpenses, expense));
 
         StringBuilder output = new StringBuilder();
-
-        //monthExpenses.forEach((key, value) -> output.append(key + " : " + value.stream().map(Expense::getAmountInCents).reduce(0, (a,b)-> a+b).intValue()/100 + "\n"));
 
         SortedSet<String> keys = new TreeSet<>(monthExpenses.keySet());
         for (String key : keys) {

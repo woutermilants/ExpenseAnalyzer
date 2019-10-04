@@ -140,14 +140,19 @@ public class FileController {
                     formattedCounterPartAccount = counterPartAccount.replaceAll(" ", "");
                 }
                 counterPartBuilder.accountNumber(formattedCounterPartAccount);
-                counterPartBuilder.name(StringUtils.isBlank(counterPartName) ? counterPartName : description);
+                counterPartBuilder.ownAccount(
+                        formattedCounterPartAccount.equals("BE38737050190772") ||
+                        formattedCounterPartAccount.equals("BE41741005912410") ||
+                        formattedCounterPartAccount.equals("BE17745010141421") ||
+                        formattedCounterPartAccount.equals("BE54745108099697"));
+                counterPartBuilder.name(StringUtils.isBlank(counterPartName) ? counterPartName : description.substring(0,70));
                 CounterPart counterPart = counterPartBuilder.build();
-                Optional<CounterPart> optionaCounterPart = counterPartService.findByAccountNumber(formattedCounterPartAccount);
-                if (!optionaCounterPart.isPresent()) {
+                Optional<CounterPart> optionalCounterPart = counterPartService.findByAccountNumber(formattedCounterPartAccount);
+                if (!optionalCounterPart.isPresent()) {
                     counterPartService.save(counterPart);
-                } else if (StringUtils.isBlank(optionaCounterPart.get().getName())) {
-                    optionaCounterPart.get().setName(counterPartName);
-                    counterPartService.save(optionaCounterPart.get());
+                } else if (StringUtils.isBlank(optionalCounterPart.get().getName())) {
+                    optionalCounterPart.get().setName(counterPartName);
+                    counterPartService.save(optionalCounterPart.get());
                 }
 
                 Direction direction = determineCostOrIncome(incomeAmount, costAmount);

@@ -23,28 +23,10 @@ public class CounterPartService {
     private MyMapper myMapper;
     private ExpenseService expenseService;
 
-    public Page<CounterPartDto> findAll(PageRequest pageRequest) {
-        Page<CounterPartDto> counterPartDtos = convertPage(counterPartRepository.findAll(pageRequest));
-        counterPartDtos.stream()
-                .forEach(this::calculateTotalsForCounterPart);
-        return counterPartDtos;
+    public Page<CounterPart> findAll(PageRequest pageRequest) {
+        return counterPartRepository.findAll(pageRequest);
     }
 
-    private void calculateTotalsForCounterPart(CounterPartDto counterPartDto) {
-        counterPartDto.setTotalAmountSpent(expenseService.getTotalPerCounterPart(counterPartDto.getAccountNumber(), Direction.COST));
-        counterPartDto.setTotalAmountReceived(expenseService.getTotalPerCounterPart(counterPartDto.getAccountNumber(), Direction.INCOME));
-    }
-
-    private Page<CounterPartDto> convertPage(Page<CounterPart> page) {
-        List<CounterPart> cameras = page.getContent();
-        return new PageImpl<>(
-                cameras.stream()
-                        .map(myMapper::domainToDTO)
-                        .collect(Collectors.toList()),
-                page.getPageable(),
-                page.getTotalElements()
-        );
-    }
 
    /* public Double calculateTotalForCounterPart(Long id, Direction cost) {
         Optional<CounterPart> optionalCounterPart = counterPartRepository.findById(id);
@@ -54,13 +36,13 @@ public class CounterPartService {
         return 0.0d;
     }*/
 
-    public CounterPartDto updateCounterpart(String accountNumber, CounterPartDto counterPartDto) {
-        Optional<CounterPart> optionalCounterPart = counterPartRepository.findByAccountNumber(accountNumber);
+    public CounterPart updateCounterpart(String accountNumber, CounterPart counterPart) {
+        final Optional<CounterPart> optionalCounterPart = counterPartRepository.findByAccountNumber(accountNumber);
         if (optionalCounterPart.isPresent()) {
-            CounterPart counterPart = optionalCounterPart.get();
-            counterPart.setOwnAccount(counterPartDto.isOwnAccount());
-            counterPart.setRecurringCounterPart(counterPartDto.isRecurringCounterPart());
-            return myMapper.domainToDTO(counterPartRepository.save(counterPart));
+            CounterPart persistedCounterPart = optionalCounterPart.get();
+            persistedCounterPart.setOwnAccount(counterPart.isOwnAccount());
+            persistedCounterPart.setRecurringCounterPart(counterPart.isRecurringCounterPart());
+            return counterPartRepository.save(persistedCounterPart);
         }
         return null;
     }
