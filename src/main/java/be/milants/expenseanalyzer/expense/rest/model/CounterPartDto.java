@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 @Data
 @NoArgsConstructor
@@ -18,4 +19,5 @@ public class CounterPartDto {
     private boolean ownAccount;
     private BigDecimal totalAmountReceived;
     private BigDecimal totalAmountSpent;
+    private List<ExpenseDto> expenses;
 }

@@ -2,7 +2,7 @@ package be.milants.expenseanalyzer.controller;
 
 import be.milants.expenseanalyzer.expense.rest.model.ExpenseDto;
 import be.milants.expenseanalyzer.service.ReportService;
-import be.milants.expenseanalyzer.service.mapper.MyMapper;
+import be.milants.expenseanalyzer.service.mapper.ExpenseMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -23,7 +23,7 @@ public class ReportController {
 
     private final ReportService reportService;
 
-    private final MyMapper myMapper;
+    private final ExpenseMapper expenseMapper;
 
     @GetMapping(path = "/recurringPayments")
     public Map<String, List<ExpenseDto>> getRecurringPayments() {
@@ -32,6 +32,6 @@ public class ReportController {
                 .stream()
                 .collect(Collectors.toMap(
                         Map.Entry::getKey,
-                        mapEntry -> myMapper.domainToDTO(mapEntry.getValue())));
+                        mapEntry -> expenseMapper.domainToDTO(mapEntry.getValue())));
     }
 }

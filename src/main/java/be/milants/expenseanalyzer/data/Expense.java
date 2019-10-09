@@ -29,7 +29,7 @@ public class Expense {
     private String currentBalance;
     private BigDecimal amount;
     private Direction direction;
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="counterpart", nullable=false)
     private CounterPart counterPart;
     private String statement;

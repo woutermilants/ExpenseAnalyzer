@@ -145,16 +145,15 @@ public class FileController {
                         formattedCounterPartAccount.equals("BE41741005912410") ||
                         formattedCounterPartAccount.equals("BE17745010141421") ||
                         formattedCounterPartAccount.equals("BE54745108099697"));
-                counterPartBuilder.name(StringUtils.isBlank(counterPartName) ? counterPartName : description.substring(0,70));
+                counterPartBuilder.name(counterPartName);
                 CounterPart counterPart = counterPartBuilder.build();
                 Optional<CounterPart> optionalCounterPart = counterPartService.findByAccountNumber(formattedCounterPartAccount);
                 if (!optionalCounterPart.isPresent()) {
                     counterPartService.save(counterPart);
-                } else if (StringUtils.isBlank(optionalCounterPart.get().getName())) {
+                } else if (StringUtils.isBlank(optionalCounterPart.get().getName()) && StringUtils.isNotBlank(counterPartName)) {
                     optionalCounterPart.get().setName(counterPartName);
                     counterPartService.save(optionalCounterPart.get());
                 }
-
                 Direction direction = determineCostOrIncome(incomeAmount, costAmount);
                 expenseService.createExpense(accountNumber.replaceAll(" ", ""), accountName, currency, date, description, currentBalance, absAmount, direction, counterPart, statement);
                 //log.info("expense created");

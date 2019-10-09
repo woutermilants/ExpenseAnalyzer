@@ -5,7 +5,8 @@ import be.milants.expenseanalyzer.data.Direction;
 import be.milants.expenseanalyzer.expense.rest.model.CounterPartDto;
 import be.milants.expenseanalyzer.service.CounterPartService;
 import be.milants.expenseanalyzer.service.ExpenseService;
-import be.milants.expenseanalyzer.service.mapper.MyMapper;
+import be.milants.expenseanalyzer.service.mapper.CounterPartMapper;
+import be.milants.expenseanalyzer.service.mapper.ExpenseMapper;
 import be.milants.expenseanalyzer.util.PageRequestUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -24,7 +25,7 @@ import java.util.stream.Collectors;
 public class CounterPartController {
 
     private final CounterPartService counterPartService;
-    private final MyMapper myMapper;
+    private final CounterPartMapper counterPartMapper;
     private final ExpenseService expenseService;
 
     @GetMapping
@@ -46,15 +47,15 @@ public class CounterPartController {
     public CounterPartDto updateCounterpart(@PathVariable String accountNumber,
                                             @RequestBody CounterPartDto counterPartDto) {
         log.info("Updating counterpart with accountNumber {}", accountNumber);
-        final CounterPart counterPart = myMapper.dtoToDomain(counterPartDto);
-        return myMapper.domainToDTO(counterPartService.updateCounterpart(accountNumber, counterPart));
+        final CounterPart counterPart = counterPartMapper.dtoToDomain(counterPartDto);
+        return counterPartMapper.domainToDTO(counterPartService.updateCounterpart(accountNumber, counterPart));
     }
 
     private Page<CounterPartDto> convertPage(Page<CounterPart> page) {
-        List<CounterPart> cameras = page.getContent();
+        List<CounterPart> counterParts = page.getContent();
         return new PageImpl<>(
-                cameras.stream()
-                        .map(myMapper::domainToDTO)
+                counterParts.stream()
+                        .map(counterPartMapper::domainToDTO)
                         .collect(Collectors.toList()),
                 page.getPageable(),
                 page.getTotalElements()
