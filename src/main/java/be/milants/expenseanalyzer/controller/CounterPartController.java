@@ -43,7 +43,13 @@ public class CounterPartController {
         return counterPartDtos;
     }
 
-    @PutMapping(value = "/{accountNumber}")
+    @GetMapping(path = "/{accountNumber}")
+    public CounterPartDto getCounterPart(@PathVariable String accountNumber) {
+        log.info("Getting counterpart with accountNumber {}", accountNumber);
+        return counterPartMapper.domainToDTO(counterPartService.getByAccountNumber(accountNumber));
+    }
+
+    @PutMapping(path = "/{accountNumber}")
     public CounterPartDto updateCounterpart(@PathVariable String accountNumber,
                                             @RequestBody CounterPartDto counterPartDto) {
         log.info("Updating counterpart with accountNumber {}", accountNumber);

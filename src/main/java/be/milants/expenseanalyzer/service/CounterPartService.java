@@ -45,6 +45,9 @@ public class CounterPartService {
     public Optional<CounterPart> findByAccountNumber(String accountNumber) {
         return counterPartRepository.findByAccountNumber(accountNumber);
     }
+    public CounterPart getByAccountNumber(String accountNumber) {
+        return counterPartRepository.getByAccountNumber(accountNumber);
+    }
 
     public CounterPart save(CounterPart counterPart) {
         return counterPartRepository.save(counterPart);
