@@ -1,19 +1,14 @@
 package be.milants.expenseanalyzer.service;
 
 import be.milants.expenseanalyzer.data.CounterPart;
-import be.milants.expenseanalyzer.data.Direction;
-import be.milants.expenseanalyzer.expense.rest.model.CounterPartDto;
 import be.milants.expenseanalyzer.repository.CounterPartRepository;
 import be.milants.expenseanalyzer.service.mapper.MyMapper;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
@@ -42,6 +37,7 @@ public class CounterPartService {
             CounterPart persistedCounterPart = optionalCounterPart.get();
             persistedCounterPart.setOwnAccount(counterPart.isOwnAccount());
             persistedCounterPart.setRecurringCounterPart(counterPart.isRecurringCounterPart());
+            persistedCounterPart.setName(counterPart.getName());
             return counterPartRepository.save(persistedCounterPart);
         }
         return null;
