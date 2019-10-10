@@ -10,4 +10,6 @@ import java.util.Optional;
 public interface CounterPartRepository extends JpaRepository<CounterPart, Long> {
 
     Optional<CounterPart> findByAccountNumber(String accountNumber);
+
+    CounterPart getByAccountNumber(String accountNumber);
 }

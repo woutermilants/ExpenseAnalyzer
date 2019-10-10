@@ -3,13 +3,12 @@ package be.milants.expenseanalyzer.service;
 import be.milants.expenseanalyzer.data.CounterPart;
 import be.milants.expenseanalyzer.data.Direction;
 import be.milants.expenseanalyzer.data.Expense;
-import be.milants.expenseanalyzer.expense.rest.model.ExpenseDto;
 import be.milants.expenseanalyzer.repository.CounterPartRepository;
 import be.milants.expenseanalyzer.repository.ExpenseRepository;
-import be.milants.expenseanalyzer.service.mapper.MyMapper;
+import be.milants.expenseanalyzer.service.mapper.ExpenseMapper;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
@@ -25,11 +24,12 @@ import static java.util.stream.Collectors.toList;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class ExpenseService {
 
     private final CounterPartRepository counterPartRepository;
     private final ExpenseRepository expenseRepository;
-    private final MyMapper myMapper;
+    private final ExpenseMapper expenseMapper;
 
     public Page<Expense> getAllExpenses(PageRequest pageRequest) {
         return expenseRepository.findAll(pageRequest);
@@ -41,8 +41,9 @@ public class ExpenseService {
 
     public void createExpense(String accountNumber, String accountName, String currency, String transactionDate, String description, String currentBalance, String stringAmount, Direction direction, CounterPart counterPart, String statement) throws ParseException {
 
-        stringAmount = stringAmount.replace(",", ".");
-        BigDecimal amount = new BigDecimal(stringAmount);
+        stringAmount = stringAmount.replaceAll(" ", "").replace(",", ".");
+        try {
+            BigDecimal amount = new BigDecimal(stringAmount);
 
         Date formattedTransactionDate = new SimpleDateFormat("dd/MM/yyyy").parse(transactionDate);
 
@@ -61,6 +62,10 @@ public class ExpenseService {
         if (!expenseRepository.findByCounterPartAndDateAndStatementAndCurrentBalance(
                 counterPart, formattedTransactionDate, statement, currentBalance).isPresent()) {
             expenseRepository.save(expense);
+        }
+        } catch (Exception e) {
+            log.error(e.getMessage());
+            return;
         }
     }
 

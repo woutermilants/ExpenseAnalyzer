@@ -2,7 +2,7 @@ package be.milants.expenseanalyzer.service;
 
 import be.milants.expenseanalyzer.data.CounterPart;
 import be.milants.expenseanalyzer.repository.CounterPartRepository;
-import be.milants.expenseanalyzer.service.mapper.MyMapper;
+import be.milants.expenseanalyzer.service.mapper.ExpenseMapper;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -15,7 +15,7 @@ import java.util.Optional;
 public class CounterPartService {
 
     private CounterPartRepository counterPartRepository;
-    private MyMapper myMapper;
+    private ExpenseMapper expenseMapper;
     private ExpenseService expenseService;
 
     public Page<CounterPart> findAll(PageRequest pageRequest) {
@@ -45,6 +45,9 @@ public class CounterPartService {
 
     public Optional<CounterPart> findByAccountNumber(String accountNumber) {
         return counterPartRepository.findByAccountNumber(accountNumber);
+    }
+    public CounterPart getByAccountNumber(String accountNumber) {
+        return counterPartRepository.getByAccountNumber(accountNumber);
     }
 
     public CounterPart save(CounterPart counterPart) {
