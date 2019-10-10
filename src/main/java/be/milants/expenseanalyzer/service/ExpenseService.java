@@ -35,8 +35,11 @@ public class ExpenseService {
         return expenseRepository.findAll(pageRequest);
     }
 
-    public List<Expense> getAllExpenses(CounterPart counterPart) {
-        return expenseRepository.findByCounterPart(counterPart);
+    public List<Expense> getAllExpenses(CounterPart counterPart, Direction direction) {
+        return expenseRepository.findByCounterPart(counterPart)
+                .stream()
+                .filter(expense -> expense.getDirection().equals(direction))
+                .collect(Collectors.toList());
     }
 
     public void createExpense(String accountNumber, String accountName, String currency, String transactionDate, String description, String currentBalance, String stringAmount, Direction direction, CounterPart counterPart, String statement) throws ParseException {
