@@ -71,6 +71,7 @@ public class CounterPartController {
     private void calculateTotalsForCounterPart(CounterPartDto counterPartDto) {
         counterPartDto.setTotalAmountSpent(expenseService.getTotalPerCounterPart(counterPartDto.getAccountNumber(), Direction.COST));
         counterPartDto.setTotalAmountReceived(expenseService.getTotalPerCounterPart(counterPartDto.getAccountNumber(), Direction.INCOME));
+        log.info("" + counterPartDto.getTotalAmountSpent());
     }
 
 }
