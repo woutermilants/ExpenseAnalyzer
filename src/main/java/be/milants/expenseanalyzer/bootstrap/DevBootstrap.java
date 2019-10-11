@@ -42,18 +42,21 @@ public class DevBootstrap implements ApplicationListener<ContextRefreshedEvent> 
         Path path2 = Paths.get(ClassLoader.getSystemResource("KBC_export_2017.csv").toURI());
         Path path3 = Paths.get(ClassLoader.getSystemResource("KBC_export_2018_01.csv").toURI());
         Path path4 = Paths.get(ClassLoader.getSystemResource("KBC_export_2018_02.csv").toURI());
-        Path path5 = Paths.get(ClassLoader.getSystemResource("KBC_export_2019.csv").toURI());
+        Path path5 = Paths.get(ClassLoader.getSystemResource("KBC_export_2019_01.csv").toURI());
+        Path path6 = Paths.get(ClassLoader.getSystemResource("KBC_export_2019_02.csv").toURI());
 
         MultipartFile multipartFile1 = new MockMultipartFile("file1", "name1", "text/plain", Files.readAllBytes(path1));
         MultipartFile multipartFile2 = new MockMultipartFile("file2", "name2", "text/plain", Files.readAllBytes(path2));
         MultipartFile multipartFile3 = new MockMultipartFile("file3", "name3", "text/plain", Files.readAllBytes(path3));
         MultipartFile multipartFile4 = new MockMultipartFile("file4", "name4", "text/plain", Files.readAllBytes(path4));
         MultipartFile multipartFile5 = new MockMultipartFile("file5", "name5", "text/plain", Files.readAllBytes(path5));
+        MultipartFile multipartFile6 = new MockMultipartFile("file6", "name6", "text/plain", Files.readAllBytes(path6));
 
         fileController.parseFile(multipartFile1);
         fileController.parseFile(multipartFile2);
         fileController.parseFile(multipartFile3);
         fileController.parseFile(multipartFile4);
         fileController.parseFile(multipartFile5);
+        fileController.parseFile(multipartFile6);
     }
 }

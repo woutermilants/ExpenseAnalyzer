@@ -1,6 +1,7 @@
 package be.milants.expenseanalyzer.controller;
 
 import be.milants.expenseanalyzer.data.CounterPart;
+import be.milants.expenseanalyzer.data.Direction;
 import be.milants.expenseanalyzer.data.Expense;
 import be.milants.expenseanalyzer.expense.rest.model.ExpenseDto;
 import be.milants.expenseanalyzer.service.CounterPartService;
@@ -43,7 +44,7 @@ public class ExpenseController {
     public List<ExpenseDto> getAllExpenses(@PathVariable String accountNumber) {
         final Optional<CounterPart> optionalCounterPart = counterPartService.findByAccountNumber(accountNumber);
         if (optionalCounterPart.isPresent()) {
-            return expenseMapper.domainToDTO(expenseService.getAllExpenses(optionalCounterPart.get()));
+            return expenseMapper.domainToDTO(expenseService.getAllExpenses(optionalCounterPart.get(), Direction.COST));
         }
         return Collections.emptyList();
     }
