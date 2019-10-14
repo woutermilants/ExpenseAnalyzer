@@ -1,10 +1,9 @@
 package be.milants.expenseanalyzer.repository;
 
-import be.milants.expenseanalyzer.data.Cost;
-import be.milants.expenseanalyzer.data.CounterPart;
+import be.milants.expenseanalyzer.data.RecurringCost;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface CostRepository extends JpaRepository<Cost, Long> {
+public interface RecurringCostRepository extends JpaRepository<RecurringCost, Long> {
 }

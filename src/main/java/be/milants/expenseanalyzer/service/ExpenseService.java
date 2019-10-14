@@ -42,6 +42,10 @@ public class ExpenseService {
                 .collect(Collectors.toList());
     }
 
+    public Expense getExpenseById(Long id) {
+        return expenseRepository.getOne(id);
+    }
+
     public void createExpense(String accountNumber, String accountName, String currency, String transactionDate, String description, String currentBalance, String stringAmount, Direction direction, CounterPart counterPart, String statement) throws ParseException {
 
         stringAmount = stringAmount.replaceAll(" ", "").replace(",", ".");

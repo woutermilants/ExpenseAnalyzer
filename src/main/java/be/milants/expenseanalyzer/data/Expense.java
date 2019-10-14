@@ -33,4 +33,7 @@ public class Expense {
     @JoinColumn(name="counterpart", nullable=false)
     private CounterPart counterPart;
     private String statement;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name="recurringcost", nullable=true)
+    private RecurringCost recurringCost;
 }

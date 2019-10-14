@@ -26,6 +26,9 @@ public class CounterPart {
     @JsonIgnore
     @OneToMany(mappedBy = "counterPart")
     private List<Expense> expenses;
+    @JsonIgnore
+    @OneToMany(mappedBy = "counterPart")
+    private List<RecurringCost> recurringCosts;
 
     public CounterPart(String accountNumber, String name) {
         this.accountNumber = accountNumber;
