@@ -20,4 +20,5 @@ public class CounterPartDto {
     private BigDecimal totalAmountReceived;
     private BigDecimal totalAmountSpent;
     private List<ExpenseDto> expenses;
+    private RecurringCostDto recurringCost;
 }

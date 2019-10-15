@@ -10,17 +10,13 @@ import org.mapstruct.Mapping;
 
 import java.util.List;
 
-@Mapper(componentModel = "spring")
+@Mapper(componentModel = "spring", uses = { CounterPartMapper.class })
 public interface ExpenseMapper {
 
     Expense dtoToDomain(ExpenseDto expenseDto);
 
-    CounterPart dtoToDomain(CounterPartDto counterPartDto);
-
-    @Mapping(target = "expenses", ignore = true)
-    CounterPartDto domainToDTO(CounterPart counterPart);
-
     @Mapping(source = "date", target = "date", dateFormat = "dd/MM/yyyy")
+    @Mapping(target = "recurringCost", ignore = true)
     ExpenseDto domainToDTO(Expense expense);
 
     List<ExpenseDto> domainToDTO(List<Expense> expense);

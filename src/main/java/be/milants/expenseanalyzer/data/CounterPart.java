@@ -8,6 +8,7 @@ import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import java.util.List;
+import java.util.Set;
 
 @Entity
 @AllArgsConstructor
@@ -26,7 +27,6 @@ public class CounterPart {
     @JsonIgnore
     @OneToMany(mappedBy = "counterPart")
     private List<Expense> expenses;
-    @JsonIgnore
     @OneToMany(mappedBy = "counterPart")
     private List<RecurringCost> recurringCosts;
 

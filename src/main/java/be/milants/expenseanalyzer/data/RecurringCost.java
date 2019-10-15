@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import java.util.List;
+import java.util.Set;
 
 @Entity
 @Builder
@@ -19,10 +20,12 @@ public class RecurringCost {
     @Column(length = 40)
     private Long id;
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name="counterpart", nullable=false)
+    @JoinColumn(name = "counterPart_accountNumber", nullable = false)
     private CounterPart counterPart;
     private String description;
-    @OneToMany(mappedBy = "recurringCost")
+    @OneToMany(mappedBy = "recurringCost",
+            fetch = FetchType.EAGER,
+            cascade = CascadeType.ALL)
     private List<Expense> expenses;
     private RecurringOption recurringOption;
 }

@@ -25,4 +25,5 @@ public class ExpenseDto {
     private Direction direction;
     private CounterPartDto counterPart;
     private String statement;
+    private RecurringCostDto recurringCost;
 }

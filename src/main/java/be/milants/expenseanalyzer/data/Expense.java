@@ -11,6 +11,7 @@ import java.util.Date;
 @AllArgsConstructor
 @Builder
 @Getter
+@Setter
 @Table(name = "expense")
 @ToString
 public class Expense {
@@ -30,10 +31,10 @@ public class Expense {
     private BigDecimal amount;
     private Direction direction;
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name="counterpart", nullable=false)
+    @JoinColumn(name="counterPart_accountNumber", nullable=false)
     private CounterPart counterPart;
     private String statement;
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name="recurringcost", nullable=true)
+    @JoinColumn(name="recurringCost_id", nullable=true)
     private RecurringCost recurringCost;
 }

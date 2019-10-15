@@ -31,6 +31,10 @@ public class ExpenseService {
     private final ExpenseRepository expenseRepository;
     private final ExpenseMapper expenseMapper;
 
+    public Expense save(Expense expense) {
+        return expenseRepository.save(expense);
+    }
+
     public Page<Expense> getAllExpenses(PageRequest pageRequest) {
         return expenseRepository.findAll(pageRequest);
     }

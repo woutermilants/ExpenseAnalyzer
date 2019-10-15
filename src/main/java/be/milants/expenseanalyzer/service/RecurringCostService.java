@@ -35,7 +35,12 @@ public class RecurringCostService {
                 .expenses(expenses)
                 .recurringOption(RecurringOption.valueOf(recurringOption))
                 .build();
-        return recurringCostRepository.save(recurringCost);
+        recurringCostRepository.save(recurringCost);
+        for (Expense expense : expenses) {
+            expense.setRecurringCost(recurringCost);
+            expenseService.save(expense);
+        }
+        return recurringCost;
     }
 
     public List<RecurringCost> findAll() {
