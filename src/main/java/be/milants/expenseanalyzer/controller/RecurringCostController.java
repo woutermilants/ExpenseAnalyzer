@@ -1,21 +1,21 @@
 package be.milants.expenseanalyzer.controller;
 
+import be.milants.expenseanalyzer.data.CounterPart;
+import be.milants.expenseanalyzer.data.Expense;
 import be.milants.expenseanalyzer.data.RecurringCost;
+import be.milants.expenseanalyzer.data.RecurringOption;
 import be.milants.expenseanalyzer.expense.rest.model.CreateRecurringCostDto;
 import be.milants.expenseanalyzer.expense.rest.model.RecurringCostDto;
+import be.milants.expenseanalyzer.expense.rest.model.RecurringOptionDto;
 import be.milants.expenseanalyzer.service.CounterPartService;
 import be.milants.expenseanalyzer.service.ExpenseService;
 import be.milants.expenseanalyzer.service.RecurringCostService;
 import be.milants.expenseanalyzer.service.mapper.RecurringCostMapper;
-import be.milants.expenseanalyzer.util.PageRequestUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping(path = "/recurringcost")
@@ -34,9 +34,20 @@ public class RecurringCostController {
         return recurringCostMapper.domainToDTO(recurringCostService.findAll());
     }
 
+    @PostMapping(path = "/counterpart/{counterPartAccountNumber}/expense/{expenseId}")
+    public RecurringCostDto createCost(@PathVariable String counterPartAccountNumber,
+                                       @PathVariable Long expenseId,
+                                       @RequestBody RecurringOptionDto recurringOptionDto) {
+        log.info("creating cost");
+        final CounterPart counterPart = counterPartService.getByAccountNumber(counterPartAccountNumber);
+        final Expense expense = expenseService.getExpenseById(expenseId);
+        final RecurringOption recurringOption = RecurringOption.valueOf(recurringOptionDto.getRecurringOption());
+        return recurringCostMapper.domainToDTO(recurringCostService.createOrAddCost(counterPart, recurringOption, expense));
+    }
+
     @PostMapping
     public RecurringCostDto createCost(@RequestBody CreateRecurringCostDto createRecurringCostDto) {
         final RecurringCost recurringCost = recurringCostService.createRecurringCost(createRecurringCostDto.getCounterPartAccountNumber(), createRecurringCostDto.getDescription(), createRecurringCostDto.getExpenseIds(), createRecurringCostDto.getRecurringOption());
-        return  recurringCostMapper.domainToDTO(recurringCost);
+        return recurringCostMapper.domainToDTO(recurringCost);
     }
 }

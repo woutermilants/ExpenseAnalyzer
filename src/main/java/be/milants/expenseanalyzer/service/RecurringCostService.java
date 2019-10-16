@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -45,5 +46,28 @@ public class RecurringCostService {
 
     public List<RecurringCost> findAll() {
         return recurringCostRepository.findAll();
+    }
+
+    public RecurringCost createOrAddCost(CounterPart counterPart, RecurringOption recurringOption, Expense expense) {
+
+        final RecurringCost recurringCost = recurringCostRepository.
+                findByCounterPartAndRecurringOption(counterPart, recurringOption)
+                .orElse(createRecurringCost(counterPart, recurringOption));
+
+        recurringCost.getExpenses().add(expense);
+        final RecurringCost persistedRecurringCost = recurringCostRepository.save(recurringCost);
+        for (Expense recurringCostExpense : recurringCost.getExpenses()) {
+            recurringCostExpense.setRecurringCost(recurringCost);
+            expenseService.save(recurringCostExpense);
+        }
+        return persistedRecurringCost;
+    }
+
+    private RecurringCost createRecurringCost(CounterPart counterPart, RecurringOption recurringOption) {
+        return RecurringCost.builder()
+                .counterPart(counterPart)
+                .recurringOption(recurringOption)
+                .expenses(new ArrayList<>())
+                .build();
     }
 }
