@@ -37,4 +37,5 @@ public class Expense {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="recurringCost_id", nullable=true)
     private RecurringCost recurringCost;
+    private boolean recurringExpense;
 }

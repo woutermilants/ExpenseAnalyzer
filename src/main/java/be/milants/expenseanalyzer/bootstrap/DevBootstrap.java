@@ -64,7 +64,7 @@ public class DevBootstrap implements ApplicationListener<ContextRefreshedEvent> 
         MultipartFile multipartFile11 = new MockMultipartFile("file11", "name11", "text/plain", Files.readAllBytes(path11));
         MultipartFile multipartFile12 = new MockMultipartFile("file12", "name12", "text/plain", Files.readAllBytes(path12));
 
-        fileController.parseFile(multipartFile1);
+/*        fileController.parseFile(multipartFile1);
         fileController.parseFile(multipartFile2);
         fileController.parseFile(multipartFile3);
         fileController.parseFile(multipartFile4);
@@ -74,7 +74,7 @@ public class DevBootstrap implements ApplicationListener<ContextRefreshedEvent> 
         fileController.parseFile(multipartFile8);
         fileController.parseFile(multipartFile9);
         fileController.parseFile(multipartFile10);
-        fileController.parseFile(multipartFile11);
+        fileController.parseFile(multipartFile11);*/
         fileController.parseFile(multipartFile12);
     }
 }

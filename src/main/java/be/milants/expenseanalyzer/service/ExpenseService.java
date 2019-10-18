@@ -50,6 +50,10 @@ public class ExpenseService {
         return expenseRepository.getOne(id);
     }
 
+    public Optional<Expense> findExpenseById(Long id) {
+        return expenseRepository.findById(id);
+    }
+
     public void createExpense(String accountNumber, String accountName, String currency, String transactionDate, String description, String currentBalance, String stringAmount, Direction direction, CounterPart counterPart, String statement) throws ParseException {
 
         stringAmount = stringAmount.replaceAll(" ", "").replace(",", ".");
@@ -69,6 +73,7 @@ public class ExpenseService {
                 .direction(direction)
                 .counterPart(counterPart)
                 .statement(statement)
+                .recurringExpense(true)
                 .build();
         if (!expenseRepository.findByCounterPartAndDateAndStatementAndCurrentBalance(
                 counterPart, formattedTransactionDate, statement, currentBalance).isPresent()) {
