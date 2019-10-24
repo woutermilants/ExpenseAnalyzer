@@ -30,11 +30,11 @@ public class Expense {
     private String currentBalance;
     private BigDecimal amount;
     private Direction direction;
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name="counterPart_accountNumber", nullable=false)
     private CounterPart counterPart;
     private String statement;
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name="recurringCost_id", nullable=true)
     private RecurringCost recurringCost;
     private boolean recurringExpense;
