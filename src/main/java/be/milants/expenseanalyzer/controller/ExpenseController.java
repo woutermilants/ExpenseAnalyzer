@@ -48,7 +48,7 @@ public class ExpenseController {
         final Optional<CounterPart> optionalCounterPart = counterPartService.findByAccountNumber(accountNumber);
         if (optionalCounterPart.isPresent()) {
             return expenseMapper.domainToDTO(
-                    expenseService.getAllExpenses(optionalCounterPart.get(), Direction.COST)
+                    expenseService.getAllExpenses(optionalCounterPart.get(), Direction.INCOME)
                             .stream()
                             .filter(expense -> !onlyRecurring || expense.isRecurringExpense())
                             .collect(Collectors.toList()));
