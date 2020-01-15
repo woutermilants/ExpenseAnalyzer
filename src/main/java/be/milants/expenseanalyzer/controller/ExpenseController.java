@@ -1,9 +1,11 @@
 package be.milants.expenseanalyzer.controller;
 
+import be.milants.expenseanalyzer.controller.error.NotFoundException;
 import be.milants.expenseanalyzer.data.CounterPart;
 import be.milants.expenseanalyzer.data.Direction;
 import be.milants.expenseanalyzer.data.Expense;
 import be.milants.expenseanalyzer.expense.rest.model.ExpenseDto;
+import be.milants.expenseanalyzer.expense.rest.model.ExpenseRecurringOnlyDto;
 import be.milants.expenseanalyzer.service.CounterPartService;
 import be.milants.expenseanalyzer.service.ExpenseService;
 import be.milants.expenseanalyzer.service.mapper.ExpenseMapper;
@@ -41,12 +43,27 @@ public class ExpenseController {
     }
 
     @GetMapping(path = "/counterpart/{accountNumber}")
-    public List<ExpenseDto> getAllExpenses(@PathVariable String accountNumber) {
+    public List<ExpenseDto> getAllExpenses(@PathVariable String accountNumber,
+                                           @RequestParam boolean onlyRecurring) {
         final Optional<CounterPart> optionalCounterPart = counterPartService.findByAccountNumber(accountNumber);
         if (optionalCounterPart.isPresent()) {
-            return expenseMapper.domainToDTO(expenseService.getAllExpenses(optionalCounterPart.get(), Direction.COST));
+            return expenseMapper.domainToDTO(
+                    expenseService.getAllExpenses(optionalCounterPart.get(), Direction.COST)
+                            .stream()
+                            .filter(expense -> !onlyRecurring || expense.isRecurringExpense())
+                            .collect(Collectors.toList()));
         }
         return Collections.emptyList();
+    }
+
+    @PatchMapping(path = "/expense/{expenseId}")
+    public ExpenseDto updateExpense(@PathVariable long expenseId,
+                                    @RequestBody ExpenseRecurringOnlyDto expenseDto) {
+        final Expense persistedExpense = expenseService.findExpenseById(expenseId).orElseThrow(NotFoundException::new);
+        persistedExpense.setRecurringExpense(expenseDto.isRecurringExpense());
+        expenseService.save(persistedExpense);
+
+        return expenseMapper.domainToDTO(persistedExpense);
     }
 
     private Page<ExpenseDto> convertPage(Page<Expense> page) {

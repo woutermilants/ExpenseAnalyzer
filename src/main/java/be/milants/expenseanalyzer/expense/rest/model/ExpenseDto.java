@@ -26,4 +26,5 @@ public class ExpenseDto {
     private CounterPartDto counterPart;
     private String statement;
     private RecurringCostDto recurringCost;
+    private boolean recurringExpense;
 }

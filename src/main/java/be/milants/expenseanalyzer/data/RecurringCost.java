@@ -19,7 +19,7 @@ public class RecurringCost {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(length = 40)
     private Long id;
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "counterPart_accountNumber", nullable = false)
     private CounterPart counterPart;
     private String description;
